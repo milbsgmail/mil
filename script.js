@@ -209,6 +209,12 @@ function loadQuestion() {
         });
     } else {
         questionText.innerHTML = "🎉 Викторина окончена!";
+        counter.textContent = gold;
+        upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
+    }
+    updateClickPower();
+}
+
 // ЗАПУСК ИГРЫ
 loadGame();
 prepareQuestions();
