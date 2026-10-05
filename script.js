@@ -36,7 +36,7 @@ let brawlers = [
     { name: "Леон", level: 1, baseCost: 6400, bonus: 600 }
 ];
 
-// База вопросов викторины
+// База вопросов викторины (26 штук)
 const allQuizQuestions = [
     { question: "Кто является начальным бойцом в Brawl Stars?", answers: ["Шелли", "Кольт", "Нита", "Брок"], correct: 0 },
     { question: "Какая редкость у бойца Леон?", answers: ["Редкий", "Эпический", "Легендарный", "Мифический"], correct: 2 },
@@ -209,13 +209,3 @@ function loadQuestion() {
         });
     } else {
         questionText.innerHTML = "🎉 Викторина окончена!";
-        counter.textContent = gold;
-        upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
-    }
-    updateClickPower();
-}
-
-// ЗАПУСК ИГРЫ
-loadGame();
-prepareQuestions();
-loadQuestion();
