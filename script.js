@@ -4,17 +4,22 @@ const clickPowerTxt = document.getElementById('click-power');
 const upgradeBtn = document.getElementById('upgrade-btn');
 const clickActionBtn = document.getElementById('click-action-btn');
 
+// Кнопка меню и блок викторины
+const quizBtn = document.getElementById('quiz-btn');
+const quizSection = document.getElementById('quiz-section');
+const clickSection = document.getElementById('click-section');
+
 const questionText = document.getElementById('questionText');
 const answersBlock = document.getElementById('answersBlock');
 
-// 2. ИСХОДНЫЕ ДАННЫЕ ИГРЫ (ПЕРЕМЕННЫЕ)
+// 2. ИСХОДНЫЕ ДАННЫЕ ИГРЫ
 let gold = 0;
 let goldPerClick = 1;
 let upgradeCost = 15;
 
 let currentQuestionIndex = 0;
 
-// База данных вопросов для викторины (можете изменить вопросы на свои)
+// База вопросов викторины
 const quizQuestions = [
     {
         question: "Кто является начальным бойцом в Brawl Stars?",
@@ -28,15 +33,27 @@ const quizQuestions = [
     }
 ];
 
-// 3. ЛОГИКА КЛИКЕРА
-// Функция обычного клика по кнопке "Клик!"
+// 3. ЛОГИКА ГЛАВНОГО МЕНЮ
+// При клике на "Викторина" показываем её блок и прячем кликер
+quizBtn.addEventListener('click', () => {
+    quizSection.style.display = 'block';
+    clickSection.style.display = 'none'; // Прячем кликер, чтобы не мешал викторине
+});
+
+// Добавим логику для кнопки "Кликер" в меню, чтобы можно было вернуться обратно
+document.getElementById('click-btn').addEventListener('click', () => {
+    quizSection.style.display = 'none';
+    clickSection.style.display = 'block';
+});
+
+
+// 4. ЛОГИКА КЛИКЕРА
 clickActionBtn.addEventListener('click', () => {
     gold += goldPerClick;
     counter.textContent = gold;
     saveGame();
 });
 
-// Функция покупки улучшения (Шахты), которую вы открыли в Блокноте
 upgradeBtn.addEventListener('click', () => {
     if (gold >= upgradeCost) {
         gold -= upgradeCost;
@@ -52,7 +69,8 @@ upgradeBtn.addEventListener('click', () => {
     }
 });
 
-// 4. ЛОГИКА ВИКТОРИНЫ
+
+// 5. ЛОГИКА ВИКТОРИНЫ
 function loadQuestion() {
     if (currentQuestionIndex < quizQuestions.length) {
         let currentQuestion = quizQuestions[currentQuestionIndex];
@@ -83,7 +101,7 @@ function checkAnswer(selectedIndex) {
     let currentQuestion = quizQuestions[currentQuestionIndex];
     if (selectedIndex === currentQuestion.correct) {
         alert("Правильно! +10 золота");
-        gold += 10; // Бонус за правильный ответ
+        gold += 10;
         counter.textContent = gold;
     } else {
         alert("Неправильно, попробуй еще раз!");
@@ -92,14 +110,14 @@ function checkAnswer(selectedIndex) {
     loadQuestion();
 }
 
-// Вспомогательные функции (заглушки для сохранения, чтобы не было ошибок в консоли)
+
+// 6. СОХРАНЕНИЕ ПРОГРЕССА
 function saveGame() {
     localStorage.setItem('gold', gold);
     localStorage.setItem('goldPerClick', goldPerClick);
     localStorage.setItem('upgradeCost', upgradeCost);
 }
 
-// Загрузка сохраненной игры при старте страницы
 function loadGame() {
     if(localStorage.getItem('gold')) {
         gold = parseInt(localStorage.getItem('gold'));
@@ -112,6 +130,6 @@ function loadGame() {
     }
 }
 
-// ЗАПУСК ИГРЫ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+// Запуск при старте страницы
 loadGame();
 loadQuestion();
