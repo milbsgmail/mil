@@ -37,10 +37,10 @@ const quizQuestions = [
 // При клике на "Викторина" показываем её блок и прячем кликер
 quizBtn.addEventListener('click', () => {
     quizSection.style.display = 'block';
-    clickSection.style.display = 'none'; // Прячем кликер, чтобы не мешал викторине
+    clickSection.style.display = 'none';
 });
 
-// Добавим логику для кнопки "Кликер" в меню, чтобы можно было вернуться обратно
+// При клике на "Кликер" возвращаем всё обратно
 document.getElementById('click-btn').addEventListener('click', () => {
     quizSection.style.display = 'none';
     clickSection.style.display = 'block';
@@ -63,9 +63,20 @@ upgradeBtn.addEventListener('click', () => {
         counter.textContent = gold;
         clickPowerTxt.textContent = goldPerClick;
         upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
+        upgradeBtn.style.backgroundColor = ""; // Сброс цвета, если до этого была ошибка
         saveGame();
     } else {
-        alert('Недостаточно золота для покупки Шахты!');
+        // Вместо alert кнопка просто кратковременно мигает красным
+        const originalText = upgradeBtn.textContent;
+        upgradeBtn.style.backgroundColor = "#ef4444";
+        upgradeBtn.style.color = "white";
+        upgradeBtn.textContent = "Недостаточно золота!";
+        
+        setTimeout(() => {
+            upgradeBtn.style.backgroundColor = "";
+            upgradeBtn.style.color = "";
+            upgradeBtn.textContent = originalText;
+        }, 1000);
     }
 });
 
@@ -83,29 +94,32 @@ function loadQuestion() {
             btn.style.backgroundColor = "#3b82f6";
             btn.style.color = "white";
             btn.style.margin = "5px";
-            btn.style.padding = "10px";
+            btn.style.padding = "10px 20px";
             btn.style.border = "none";
             btn.style.borderRadius = "6px";
             btn.style.cursor = "pointer";
+            btn.style.fontSize = "16px";
             
             btn.addEventListener('click', () => checkAnswer(index));
             answersBlock.appendChild(btn);
         });
     } else {
         questionText.innerHTML = "🎉 Викторина окончена!";
-        answersBlock.innerHTML = "<p style='color: #4ade80; font-size: 18px;'>Вы ответили правильно на все вопросы или дошли до конца!</p>";
+        answersBlock.innerHTML = "<p style='color: #4ade80; font-size: 18px; font-weight: bold;'>Вы дошли до конца викторины!</p>";
     }
 }
 
 function checkAnswer(selectedIndex) {
     let currentQuestion = quizQuestions[currentQuestionIndex];
+    
+    // Если ответ правильный — просто без окон добавляем золото
     if (selectedIndex === currentQuestion.correct) {
-        alert("Правильно! +10 золота");
         gold += 10;
         counter.textContent = gold;
-    } else {
-        alert("Неправильно, попробуй еще раз!");
+        saveGame();
     }
+    
+    // Сразу же переходим к следующему вопросу без пауз
     currentQuestionIndex++;
     loadQuestion();
 }
