@@ -38,7 +38,7 @@ let brawlers = [
 
 // База вопросов викторины
 const allQuizQuestions = [
-    { question: "Кто является начальным боецом в Brawl Stars?", answers: ["Шелли", "Кольт", "Нита", "Брок"], correct: 0 },
+    { question: "Кто является начальным бойцом в Brawl Stars?", answers: ["Шелли", "Кольт", "Нита", "Брок"], correct: 0 },
     { question: "Какая редкость у бойца Леон?", answers: ["Редкий", "Эпический", "Легендарный", "Мифический"], correct: 2 },
     { question: "Какой боец бросает чемоданы?", answers: ["Мистер П.", "Гейл", "Лу", "Поко"], correct: 0 },
     { question: "Кто из этих бойцов является роботом?", answers: ["Булл", "Рико", "Эль Примо", "Кольт"], correct: 1 },
@@ -93,8 +93,23 @@ brawlerBtn.addEventListener('click', () => {
 });
 
 // 4. ЛОГИКА КЛИКЕРА
+function getBonusPower() {
+    let extraPower = 0;
+    brawlers.forEach(b => {
+        if (b.level > 1) {
+            extraPower += (b.level - 1) * b.bonus;
+        }
+    });
+    return extraPower;
+}
+
+function updateClickPower() {
+    let totalPower = goldPerClick + getBonusPower();
+    clickPowerTxt.textContent = totalPower;
+}
+
 clickActionBtn.addEventListener('click', () => {
-    gold += goldPerClick;
+    gold += (goldPerClick + getBonusPower());
     counter.textContent = gold;
     saveGame();
 });
@@ -105,7 +120,7 @@ upgradeBtn.addEventListener('click', () => {
         goldPerClick += 1;
         upgradeCost = Math.round(upgradeCost * 1.5);
         counter.textContent = gold;
-        clickPowerTxt.textContent = goldPerClick;
+        updateClickPower();
         upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
         upgradeBtn.style.backgroundColor = "";
         saveGame();
@@ -122,36 +137,10 @@ upgradeBtn.addEventListener('click', () => {
     }
 });
 
-// Вычисление текущей общей силы клика с учётом бонусов всех прокачанных бойцов
-function updateClickPower() {
-    let extraPower = 0;
-    brawlers.forEach(b => {
-        if (b.level > 1) {
-            extraPower += (b.level - 1) * b.bonus;
-        }
-    });
-    // Итоговая сила клика = Сила от шахт + сила от всех бравлеров
-    let totalPower = goldPerClick + extraPower;
-    clickPowerTxt.textContent = totalPower;
-}
-
-// Переопределяем клик, чтобы он учитывал бонусы бравлеров
-clickActionBtn.removeEventListener('click', null);
-clickActionBtn.onclick = function() {
-    let extraPower = 0;
-    brawlers.forEach(b => {
-        if (b.level > 1) { extraPower += (b.level - 1) * b.bonus; }
-    });
-    gold += (goldPerClick + extraPower);
-    counter.textContent = gold;
-    saveGame();
-};
-
 // 5. ИНТЕРФЕЙС БОЙЦОВ
 function renderBrawlers() {
     brawlersList.innerHTML = "";
     brawlers.forEach((brawler, index) => {
-        // Стоимость улучшения зависит от текущего уровня
         let cost = Math.round(brawler.baseCost * Math.pow(1.6, brawler.level - 1));
         
         const card = document.createElement('div');
@@ -190,7 +179,7 @@ function renderBrawlers() {
                 counter.textContent = gold;
                 saveGame();
                 updateClickPower();
-                renderBrawlers(); // Перерисовываем список
+                renderBrawlers();
             }
         });
     });
@@ -207,3 +196,16 @@ function loadQuestion() {
             const btn = document.createElement('button');
             btn.textContent = answer;
             btn.style.backgroundColor = "#3b82f6";
+            btn.style.color = "white";
+            btn.style.margin = "5px";
+            btn.style.padding = "10px 20px";
+            btn.style.border = "none";
+            btn.style.borderRadius = "6px";
+            btn.style.cursor = "pointer";
+            btn.style.fontSize = "16px";
+            
+            btn.addEventListener('click', () => checkAnswer(index));
+            answersBlock.appendChild(btn);
+        });
+    } else {
+        questionText.innerHTML = "🎉 Викторина окончена!";
