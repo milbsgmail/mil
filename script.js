@@ -4,7 +4,6 @@ const clickPowerTxt = document.getElementById('click-power');
 const upgradeBtn = document.getElementById('upgrade-btn');
 const clickActionBtn = document.getElementById('click-action-btn');
 
-// Кнопка меню и блок викторины
 const quizBtn = document.getElementById('quiz-btn');
 const quizSection = document.getElementById('quiz-section');
 const clickSection = document.getElementById('click-section');
@@ -18,34 +17,47 @@ let goldPerClick = 1;
 let upgradeCost = 15;
 
 let currentQuestionIndex = 0;
+let activeQuestions = []; // Здесь будут храниться 15 случайных вопросов
 
-// База вопросов викторины
-const quizQuestions = [
-    {
-        question: "Кто является начальным бойцом в Brawl Stars?",
-        answers: ["Шелли", "Кольт", "Нита", "Эль Примо"],
-        correct: 0
-    },
-    {
-        question: "Какая редкость у бойца Леон?",
-        answers: ["Редкий", "Сверхредкий", "Эпический", "Легендарный"],
-        correct: 3
-    }
+// ОГРОМНАЯ БАЗА ВОПРОСОВ (Сюда можно дописывать сколько угодно вопросов, игра сама выберет 15)
+const allQuizQuestions = [
+    { question: "Кто является начальным бойцом в Brawl Stars?", answers: ["Шелли", "Кольт", "Нита", "Брок"], correct: 0 },
+    { question: "Какая редкость у бойца Леон?", answers: ["Редкий", "Эпический", "Легендарный", "Мифический"], correct: 2 },
+    { question: "Какой боец бросает чемоданы?", answers: ["Мистер П.", "Гейл", "Лу", "Поко"], correct: 0 },
+    { question: "Кто из этих бойцов является роботом?", answers: ["Булл", "Рико", "Эль Примо", "Кольт"], correct: 1 },
+    { question: "Какое животное вызывает Нита своей суперспособностью?", answers: ["Скример", "Медведь", "Собака", "Кот"], correct: 1 },
+    { question: "Кто лечит своих союзников музыкой?", answers: ["Поко", "Брок", "Пайпер", "Спайк"], correct: 0 },
+    { question: "Какое максимальное количество игроков в одной команде в 3v3?", answers: ["2", "3", "4", "5"], correct: 1 },
+    { question: "Кто атакует картами?", answers: ["Тара", "Джин", "Макс", "Роза"], correct: 0 },
+    { question: "Как зовут сестру Ниты по лору игры?", answers: ["У нее нет сестры", "Беа", "Джесси", "Шелли"], correct: 0 },
+    { question: "Какой боец является кактусом?", answers: ["Спайк", "Ворон", "Леон", "Сэнди"], correct: 0 },
+    { question: "Кто стреляет из снайперской винтовки и раскрывает зонтик?", answers: ["Пайпер", "Биби", "Коллет", "Эмз"], correct: 0 },
+    { question: "Что нужно собирать в режиме 'Захват кристаллов' для победы?", answers: ["Звезды", "Кубки", "Кристаллы", "Мячи"], correct: 2 },
+    { question: "Кто бегает с бейсбольной битой?", answers: ["Биби", "Джекки", "Динамайк", "Фрэнк"], correct: 0 },
+    { question: "Какое оружие использует Кольт?", answers: ["Два револьвера", "Дробовик", "Молот", "Лук"], correct: 0 },
+    { question: "Кто бросает динамитные шашки?", answers: ["Динамайк", "Барли", "Тик", "Спраут"], correct: 0 },
+    // Вы можете дописывать ниже еще вопросы по такому же шаблону!
+    { question: "Какой боец прыгает с помощью супера и кричит 'Эль Примооо'?", answers: ["Эль Примо", "Эдгар", "Кроу", "Булл"], correct: 0 }
 ];
 
+// Функция для случайного перемешивания и выбора 15 вопросов
+function prepareQuestions() {
+    // Перемешиваем всю базу вопросов случайным образом
+    let shuffled = allQuizQuestions.sort(() => 0.5 - Math.random());
+    // Берем первые 15 штук
+    activeQuestions = shuffled.slice(0, 15);
+}
+
 // 3. ЛОГИКА ГЛАВНОГО МЕНЮ
-// При клике на "Викторина" показываем её блок и прячем кликер
 quizBtn.addEventListener('click', () => {
     quizSection.style.display = 'block';
     clickSection.style.display = 'none';
 });
 
-// При клике на "Кликер" возвращаем всё обратно
 document.getElementById('click-btn').addEventListener('click', () => {
     quizSection.style.display = 'none';
     clickSection.style.display = 'block';
 });
-
 
 // 4. ЛОГИКА КЛИКЕРА
 clickActionBtn.addEventListener('click', () => {
@@ -59,19 +71,16 @@ upgradeBtn.addEventListener('click', () => {
         gold -= upgradeCost;
         goldPerClick += 1;
         upgradeCost = Math.round(upgradeCost * 1.5);
-
         counter.textContent = gold;
         clickPowerTxt.textContent = goldPerClick;
         upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
-        upgradeBtn.style.backgroundColor = ""; // Сброс цвета, если до этого была ошибка
+        upgradeBtn.style.backgroundColor = "";
         saveGame();
     } else {
-        // Вместо alert кнопка просто кратковременно мигает красным
         const originalText = upgradeBtn.textContent;
         upgradeBtn.style.backgroundColor = "#ef4444";
         upgradeBtn.style.color = "white";
         upgradeBtn.textContent = "Недостаточно золота!";
-        
         setTimeout(() => {
             upgradeBtn.style.backgroundColor = "";
             upgradeBtn.style.color = "";
@@ -80,12 +89,11 @@ upgradeBtn.addEventListener('click', () => {
     }
 });
 
-
 // 5. ЛОГИКА ВИКТОРИНЫ
 function loadQuestion() {
-    if (currentQuestionIndex < quizQuestions.length) {
-        let currentQuestion = quizQuestions[currentQuestionIndex];
-        questionText.textContent = `Вопрос ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+    if (currentQuestionIndex < activeQuestions.length) {
+        let currentQuestion = activeQuestions[currentQuestionIndex];
+        questionText.textContent = `Вопрос ${currentQuestionIndex + 1} из 15: ${currentQuestion.question}`;
         answersBlock.innerHTML = "";
 
         currentQuestion.answers.forEach((answer, index) => {
@@ -105,25 +113,20 @@ function loadQuestion() {
         });
     } else {
         questionText.innerHTML = "🎉 Викторина окончена!";
-        answersBlock.innerHTML = "<p style='color: #4ade80; font-size: 18px; font-weight: bold;'>Вы дошли до конца викторины!</p>";
+        answersBlock.innerHTML = "<p style='color: #4ade80; font-size: 18px; font-weight: bold;'>Вы ответили на все 15 вопросов! Обновите страницу, чтобы получить новые вопросы!</p>";
     }
 }
 
 function checkAnswer(selectedIndex) {
-    let currentQuestion = quizQuestions[currentQuestionIndex];
-    
-    // Если ответ правильный — просто без окон добавляем золото
+    let currentQuestion = activeQuestions[currentQuestionIndex];
     if (selectedIndex === currentQuestion.correct) {
         gold += 10;
         counter.textContent = gold;
         saveGame();
     }
-    
-    // Сразу же переходим к следующему вопросу без пауз
     currentQuestionIndex++;
     loadQuestion();
 }
-
 
 // 6. СОХРАНЕНИЕ ПРОГРЕССА
 function saveGame() {
@@ -137,13 +140,13 @@ function loadGame() {
         gold = parseInt(localStorage.getItem('gold'));
         goldPerClick = parseInt(localStorage.getItem('goldPerClick'));
         upgradeCost = parseInt(localStorage.getItem('upgradeCost'));
-        
         counter.textContent = gold;
         clickPowerTxt.textContent = goldPerClick;
         upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
     }
 }
 
-// Запуск при старте страницы
+// ЗАПУСК ИГРЫ
 loadGame();
+prepareQuestions(); // Генерируем 15 случайных вопросов при загрузке
 loadQuestion();
