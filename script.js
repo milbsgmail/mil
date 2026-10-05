@@ -65,7 +65,6 @@ const allQuizQuestions = [
     { question: "Как называется супер-способность бойца Джесси?", answers: ["Поставить турель", "Вызвать медведя", "Выстрелить ракетой", "Ускориться"], correct: 0 },
     { question: "Какая кнопка отвечает за использование особого гаджета бойца?", answers: ["Зеленая", "Желтая", "Красная", "Синяя"], correct: 0 }
 ];
-
 function prepareQuestions() {
     let shuffled = [...allQuizQuestions].sort(() => 0.5 - Math.random());
     activeQuestions = shuffled.slice(0, 15);
@@ -96,9 +95,7 @@ brawlerBtn.addEventListener('click', () => {
 function getBonusPower() {
     let extraPower = 0;
     brawlers.forEach(b => {
-        if (b.level > 1) {
-            extraPower += (b.level - 1) * b.bonus;
-        }
+        if (b.level > 1) { extraPower += (b.level - 1) * b.bonus; }
     });
     return extraPower;
 }
@@ -142,7 +139,6 @@ function renderBrawlers() {
     brawlersList.innerHTML = "";
     brawlers.forEach((brawler, index) => {
         let cost = Math.round(brawler.baseCost * Math.pow(1.6, brawler.level - 1));
-        
         const card = document.createElement('div');
         card.style.border = "2px solid #4b5563";
         card.style.borderRadius = "8px";
@@ -159,7 +155,6 @@ function renderBrawlers() {
                 Прокачать: ${cost} Золота
             </button>
         `;
-        
         brawlersList.appendChild(card);
 
         const upBtn = document.getElementById(`up-brawler-${index}`);
@@ -209,3 +204,43 @@ function loadQuestion() {
         });
     } else {
         questionText.innerHTML = "🎉 Викторина окончена!";
+        answersBlock.innerHTML = "<p style='color: #4ade80; font-size: 18px; font-weight: bold;'>Вы ответили на все 15 вопросов! Обновите страницу, чтобы получить новые вопросы.</p>";
+    }
+}
+
+function checkAnswer(selectedIndex) {
+    let currentQuestion = activeQuestions[currentQuestionIndex];
+    if (selectedIndex === currentQuestion.correct) {
+        gold += 10;
+        counter.textContent = gold;
+        saveGame();
+    }
+    currentQuestionIndex++;
+    loadQuestion();
+}
+
+// 7. СОХРАНЕНИЕ ПРОГРЕССА
+function saveGame() {
+    localStorage.setItem('gold', gold);
+    localStorage.setItem('goldPerClick', goldPerClick);
+    localStorage.setItem('upgradeCost', upgradeCost);
+    localStorage.setItem('brawlers_data', JSON.stringify(brawlers));
+}
+
+function loadGame() {
+    if(localStorage.getItem('gold')) {
+        gold = parseInt(localStorage.getItem('gold'));
+        goldPerClick = parseInt(localStorage.getItem('goldPerClick'));
+        upgradeCost = parseInt(localStorage.getItem('upgradeCost'));
+        let savedBrawlers = localStorage.getItem('brawlers_data');
+        if(savedBrawlers) { brawlers = JSON.parse(savedBrawlers); }
+        counter.textContent = gold;
+        upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
+    }
+    updateClickPower();
+}
+
+// ЗАПУСК ИГРЫ
+loadGame();
+prepareQuestions();
+loadQuestion();
