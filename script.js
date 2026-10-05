@@ -209,3 +209,7 @@ function loadQuestion() {
         });
     } else {
         questionText.innerHTML = "🎉 Викторина окончена!";
+// ЗАПУСК ИГРЫ
+loadGame();
+prepareQuestions();
+loadQuestion();
