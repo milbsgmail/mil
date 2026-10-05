@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бравл-Клаб</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Бравл-Клаб</h1>
+    <p>Сайт нашего клуба</p>
+
+    <!-- Главное меню -->
+    <button id="brawler-btn">Бойцы</button>
+    <button id="quiz-btn">Викторина</button>
+    <button id="click-btn">Кликер</button>
+    <button id="top-btn">Топ игроков</button>
+
+    <!-- Раздел Кликера -->
+    <div id="click-section" style="margin-top: 20px;">
+        <div style="font-size: 24px; color: #ffcc00;">
+            Золото: <span id="gold-count">0</span> 🟡
+        </div>
+        <div style="margin-top: 20px;">
+            <button id="click-action-btn" style="background-color: #ff4500; color: white;">Клик!</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <button id="upgrade-btn">Купить Шахту (Цена: 15 золота)</button>
+            <p style="font-size: 16px; opacity: 0.8;">Сейчас даёт за клик: <span id="click-power">1</span> золота</p>
+        </div>
+    </div>
+
+    <!-- Раздел Бойцов -->
+    <div id="brawlers-section" style="display: none; margin-top: 30px;">
+        <h2>👥 Бойцы нашего клуба</h2>
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <div class="brawler-card">
+                <h3>Леон</h3>
+                <p>Легендарный убийца. Может становиться невидимым!</p>
+            </div>
+            <div class="brawler-card">
+                <h3>Спайк</h3>
+                <p>Кидается кактусами, которые разлетаются на иголки.</p>
+            </div>
+            <div class="brawler-card">
+                <h3>Ворон</h3>
+                <p>Атакует ядовитыми кинжалами.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Раздел Викторины -->
+    <div id="quiz-section" style="display: none; margin-top: 30px; background-color: #1f2937; padding: 20px; border-radius: 12px; border: 3px solid #ffcc00; max-width: 400px; margin-left: auto; margin-right: auto;">
+        <h2>🎯 Викторина Brawl Stars</h2>
+        <p id="question-text" style="font-size: 20px; color: #ffcc00; font-weight: bold;"></p>
+        <div id="answers-block" style="display: flex; flex-direction: column;"></div>
+        <p style="font-size: 18px; margin-top: 15px;">Очки викторины: <span id="quiz-score">0</span></p>
+    </div>
+
+    <!-- Раздел Топ игроков -->
+    <div id="top-section" style="display: none; margin-top: 30px;">
+        <h2>🏆 Топ игроков нашего клуба</h2>
+        <table border="1" style="margin: 0 auto; font-size: 20px; border-collapse: collapse; width: 300px; text-align: center;">
+            <tr>
+                <th>Место</th>
+                <th>Ник</th>
+                <th>Очки</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Твой Ник</td>
+                <td>9999</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Друг_1</td>
+                <td>5000</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Друг_2</td>
+                <td>1200</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Логика интерактива -->
+    <script>
+        let gold = Number(localStorage.getItem('gold')) || 0;
+        let goldPerClick = Number(localStorage.getItem('goldPerClick')) || 1; 
+        let upgradeCost = Number(localStorage.getItem('upgradeCost')) || 15; 
+        let quizScore = 0; 
+        let currentQuestionIndex = 0;
+
+        const brawlerBtn = document.getElementById('brawler-btn');
+        const quizBtn = document.getElementById('quiz-btn');
+        const clickBtn = document.getElementById('click-btn');
+        const topBtn = document.getElementById('top-btn');
+
+        const clickSection = document.getElementById('click-section');
+        const brawlersSection = document.getElementById('brawlers-section');
+        const quizSection = document.getElementById('quiz-section');
+        const topSection = document.getElementById('top-section');
+
+        const clickActionBtn = document.getElementById('click-action-btn');
+        const counter = document.getElementById('gold-count');
+        const upgradeBtn = document.getElementById('upgrade-btn');
+        const clickPowerTxt = document.getElementById('click-power');
+
+        const questionText = document.getElementById('question-text');
+        const answersBlock = document.getElementById('answers-block');
+        const scoreTxt = document.getElementById('quiz-score');
+
+        const quizQuestions = [
+            { question: "Кто является лицом игры Brawl Stars?", answers: ["Шелли", "Эль Примо", "Поко", "Кольт"], correct: 0 },
+            { question: "Какой боец бросает чемоданы?", answers: ["Тара", "Мистер П.", "Гейл", "Лу"], correct: 1 },
+            { question: "Как зовут брата-робота Лолы?", answers: ["Рико", "Барли", "Грей", "У неё нет брата-робота"], correct: 3 },
+            { question: "Какая редкость у бойца Спайк?", answers: ["Редкий", "Эпический", "Легендарный", "Мифический"], correct: 2 },
+            { question: "Кто атакует гитарой и лечит союзников супер-атакой?", answers: ["Поко", "Брок", "Кольт", "Фрэнк"], correct: 0 },
+            { question: "Какой боец может прыгать с помощью своей супер-атаки без гаджетов?", answers: ["Эль Примо", "Динамайк", "Шелли", "Джесси"], correct: 0 },
+            { question: "Кто из этих бойцов является хроматическим?", answers: ["Кольт", "Вольт", "Булл", "Поко"], correct: 1 },
+            { question: "Чей питомец — это механический медведь?", answers: ["Нита", "Джесси", "Пенни", "Бо"], correct: 0 },
+            { question: "Какой боец стреляет самонаводящимися пчёлами?", answers: ["Беа", "Пайпер", "Эмз", "Макс"], correct: 0 },
+            { question: "Кто из бойцов работает копателем в шахте?", answers: ["Карл", "Динамайк", "Джеки", "Все перечисленные"], correct: 3 },
+            { question: "У какого легендарного бойца есть супер-способность песчаной бури?", answers: ["Сэнди", "Леон", "Ворон", "Честер"], correct: 0 },
+            { question: "Какое оружие использует Кольт?", answers: ["Два револьвера", "Дробовик", "Ракетница", "Лук со стрелами"], correct: 0 },
+            { question: "Кто из бойцов постоянно ходит в капюшоне-хамелеоне?", answers: ["Леон", "Базз", "Фэнг", "Эдгар"], correct: 0 },
+            { question: "Какой боец замораживает врагов ледяными атаками?", answers: ["Лу", "Гейл", "Отис", "Эмз"], correct: 0 },
+            { question: "Сколько бойцов было в самом первом релизе игры?", answers: ["15", "21", "30", "10"], correct: 0 }
+        ];
+
+        counter.textContent = gold;
+        clickPowerTxt.textContent = goldPerClick;
+        upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
+
+        function saveGame() {
+            localStorage.setItem('gold', gold);
+            localStorage.setItem('goldPerClick', goldPerClick);
+            localStorage.setItem('upgradeCost', upgradeCost);
+        }
+
+        function showSection(sectionToShow) {
+            clickSection.style.display = 'none';
+            brawlersSection.style.display = 'none';
+            quizSection.style.display = 'none';
+            topSection.style.display = 'none';
+            sectionToShow.style.display = 'block';
+        }
+
+        clickBtn.addEventListener('click', () => showSection(clickSection));
+        brawlerBtn.addEventListener('click', () => showSection(brawlersSection));
+        topBtn.addEventListener('click', () => showSection(topSection));
+        quizBtn.addEventListener('click', () => {
+            showSection(quizSection);
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            scoreTxt.textContent = quizScore;
+            loadQuestion();
+        });
+
+        clickActionBtn.addEventListener('click', () => {
+            gold += goldPerClick;
+            counter.textContent = gold;
+            saveGame();
+        });
+
+        upgradeBtn.addEventListener('click', () => {
+            if (gold >= upgradeCost) {
+                gold -= upgradeCost;
+                goldPerClick += 1;
+                upgradeCost = Math.round(upgradeCost * 1.5);
+                
+                counter.textContent = gold;
+                clickPowerTxt.textContent = goldPerClick;
+                upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
+                saveGame();
+            } else {
+                alert('Недостаточно золота для покупки Шахты!');
+            }
+        });
+
+        function loadQuestion() {
+            if (currentQuestionIndex < quizQuestions.length) {
+                let currentQuestion = quizQuestions[currentQuestionIndex];
+                questionText.textContent = `Вопрос ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+                answersBlock.innerHTML = "";
+                currentQuestion.answers.forEach((answer, index) => {
+                    const btn = document.createElement('button');
+                    btn.textContent = answer;
+                    btn.style.backgroundColor = "#3b82f6";
+                    btn.style.color = "white";
+                    btn.style.margin = "5px";
+                    btn.style.padding = "10px";
+                    btn.style.border = "none";
+                    btn.style.borderRadius = "6px";
+                    btn.style.cursor = "pointer";
+                    btn.addEventListener('click', () => checkAnswer(index));
+                    answersBlock.appendChild(btn);
+                });
+            } else {
+                questionText.textContent = "🎉 Викторина окончена!";
+                answersBlock.innerHTML = `<p style='color: #4ade80; font-size: 18px;'>Вы ответили правильно на все вопросы или дошли до конца!</p>`;
+            }
+        }
+
+        function checkAnswer(selectedIndex) {
+            let currentQuestion = quizQuestions[currentQuestionIndex];
