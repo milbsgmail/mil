@@ -1,0 +1,102 @@
+/* Геймерский темный фон */
+body {
+    background-color: #111827;
+    color: #ffffff;
+    font-family: 'Arial Black', sans-serif;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    touch-action: manipulation; /* Отключает приближение при двойном клике на телефоне */
+}
+
+/* Стилизация заголовка */
+h1 {
+    color: #ffcc00;
+    font-size: 36px;
+    margin-bottom: 5px;
+}
+
+/* Общий стиль для кнопок в стилистике Brawl Stars */
+button {
+    background-color: #ffcc00;
+    color: #000000;
+    border: 3px solid #ffffff;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #cc9900;
+    transition: transform 0.1s, background-color 0.1s;
+}
+
+/* Анимация кнопок при наведении */
+button:hover {
+    background-color: #ffe680;
+    transform: scale(1.05);
+}
+
+/* Акцент на кнопке кликера */
+#click-action-btn {
+    background-color: #ff4500;
+    color: #ffffff;
+    box-shadow: 0 4px 0 #b33000;
+    font-size: 24px;
+    padding: 15px 40px;
+}
+#click-action-btn:hover {
+    background-color: #ff6347;
+}
+
+/* Карточки бойцов */
+.brawler-card {
+    background-color: #1f2937; 
+    border: 3px solid #ffcc00; 
+    border-radius: 12px; 
+    padding: 15px; 
+    width: 250px;
+    box-sizing: border-box;
+}
+
+/* Стилизация таблицы лидеров */
+table {
+    background-color: #1f2937;
+    border: 3px solid #ffcc00 !important;
+    margin: 20px auto 0 auto;
+    width: 100%;
+    max-width: 400px;
+}
+th {
+    background-color: #374151 !important;
+    color: #ffcc00 !important;
+    padding: 10px;
+}
+td {
+    color: #ffffff !important;
+    padding: 10px;
+}
+
+/* НАСТРОЙКИ ДЛЯ МОБИЛЬНЫХ ТЕЛЕФОНОВ */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 28px;
+    }
+    
+    button {
+        display: block;
+        width: 100%;
+        max-width: 280px;
+        margin: 10px auto;
+        box-sizing: border-box;
+    }
+    
+    #click-action-btn {
+        max-width: 200px;
+    }
+
+    .brawler-card {
+        width: 100%;
+        max-width: 280px;
+    }
+}
