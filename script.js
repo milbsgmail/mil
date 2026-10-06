@@ -258,4 +258,3 @@ setInterval(() => {
         gold += income;
         counter.textContent = Math.floor(gold);
     }
-    
