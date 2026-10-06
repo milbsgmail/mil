@@ -25,6 +25,10 @@
         <div style="font-size: 24px; color: #ffcc00; font-weight: bold;">
             Золото: <span id="gold-count">0</span>
         </div>
+        <!-- Индикатор пассивного дохода -->
+        <div id="cps-display" style="font-size: 16px; color: #4ade80; margin-top: 5px;">
+            В секунду: +0 золота
+        </div>
         
         <div style="margin-top: 20px;">
             <button id="click-action-btn">Клик!</button>
@@ -45,9 +49,9 @@
     <!-- Раздел Бойцов -->
     <div id="brawlers-section" style="margin-top: 30px; border-top: 1px solid #4b5563; padding-top: 20px; display: none;">
         <h2>Ваша команда бойцов</h2>
-        <p style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">Прокачивайте бойцов, чтобы увеличивать силу клика!</p>
+        <p style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">Прокачивайте бойцов, чтобы увеличивать силу клика и пассивный доход!</p>
         <div id="brawlers-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; justify-content: center; padding: 10px;">
-            <!-- Создается через JS -->
+            <!-- Бойцы создаются через JS -->
         </div>
     </div>
 
@@ -63,26 +67,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>🥇 1</td>
-                    <td>Magician_BS</td>
-                    <td>95,400</td>
-                </tr>
-                <tr>
-                    <td>🥈 2</td>
-                    <td>CyberLeon</td>
-                    <td>82,100</td>
-                </tr>
-                <tr>
-                    <td>🥉 3</td>
-                    <td>BrawlMaster</td>
-                    <td>74,500</td>
-                </tr>
-                <tr style="border-top: 2px dashed #ffcc00;">
-                    <td>Вы</td>
-                    <td id="player-name">Игрок</td>
-                    <td id="player-gold">0</td>
-                </tr>
+                <!-- Таблица лидеров заполняется динамически через JS -->
             </tbody>
         </table>
     </div>
