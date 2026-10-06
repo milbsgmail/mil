@@ -1,208 +1,135 @@
-// --- ИГРОВОЕ СОСТОЯНИЕ (STATE) ---
-let gold = 0;
-let clickPower = 1;
-let gps = 0; // Золото в секунду (Gold Per Second)
-
-// --- ЭЛЕМЕНТЫ UI ---
-const goldCountEl = document.getElementById('gold-count');
-const cpsDisplayEl = document.getElementById('cps-display');
-const clickPowerEl = document.getElementById('click-power');
-
-// --- 1. НАВИГАЦИЯ (Переключение вкладок) ---
-const sections = {
-    'click-btn': document.getElementById('click-section'),
-    'brawler-btn': document.getElementById('brawlers-section'),
-    'quiz-btn': document.getElementById('quiz-section'),
-    'top-btn': document.getElementById('top-section')
-};
-
-Object.keys(sections).forEach(btnId => {
-    document.getElementById(btnId).addEventListener('click', () => {
-        // Скрываем все секции
-        Object.values(sections).forEach(sec => sec.style.display = 'none');
-        // Показываем нужную
-        sections[btnId].style.display = 'block';
-    });
-});
-
-// --- 2. МЕХАНИКА КЛИКЕРА ---
-const clickActionBtn = document.getElementById('click-action-btn');
-const upgradeBtn = document.getElementById('upgrade-btn');
-
-function updateUI() {
-    goldCountEl.textContent = Math.floor(gold);
-    cpsDisplayEl.textContent = `В секунду: +${gps} золота`;
-    clickPowerEl.textContent = clickPower;
+/* Геймерский темный фон */
+body {
+    background-color: #111827;
+    color: #ffffff;
+    font-family: 'Arial Black', sans-serif;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    touch-action: manipulation; /* Отключает приближение при двойном клике на телефоне */
 }
 
-// Клик по кнопке
-clickActionBtn.addEventListener('click', () => {
-    gold += clickPower;
-    updateUI();
-});
+/* Стилизация заголовка */
+h1 {
+    color: #ffcc00;
+    font-size: 36px;
+    margin-bottom: 5px;
+}
 
-// Пассивный доход (каждую секунду)
-setInterval(() => {
-    gold += gps;
-    updateUI();
-}, 1000);
+/* Общий стиль для кнопок в стилистике Brawl Stars */
+button {
+    background-color: #ffcc00;
+    color: #000000;
+    border: 3px solid #ffffff;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #cc9900;
+    transition: transform 0.1s, background-color 0.1s;
+}
 
-// Покупка Шахты (улучшение клика)
-let minePrice = 15;
-upgradeBtn.addEventListener('click', () => {
-    if (gold >= minePrice) {
-        gold -= minePrice;
-        clickPower += 1;
-        minePrice = Math.round(minePrice * 1.5);
-        upgradeBtn.textContent = `Купить Шахту (Цена: ${minePrice} золота)`;
-        updateUI();
-    } else {
-        alert('Недостаточно золота!');
+/* Анимация кнопок при наведении */
+button:hover {
+    background-color: #ffe680;
+    transform: scale(1.05);
+}
+
+/* Эффект нажатия кнопок */
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 0 #cc9900;
+}
+
+/* Акцент на кнопке кликера */
+#click-action-btn {
+    background-color: #ff4500;
+    color: #ffffff;
+    box-shadow: 0 4px 0 #b33000;
+    font-size: 24px;
+    padding: 15px 40px;
+}
+#click-action-btn:hover {
+    background-color: #ff6347;
+}
+#click-action-btn:active {
+    box-shadow: 0 2px 0 #b33000;
+}
+
+/* Карточки бойцов */
+.brawler-card {
+    background-color: #1f2937; 
+    border: 3px solid #ffcc00; 
+    border-radius: 12px; 
+    padding: 15px; 
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Кнопки ответов в викторине */
+.quiz-answer-btn {
+    display: block;
+    width: 80%;
+    max-width: 400px;
+    margin: 10px auto;
+    background-color: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 4px 0 #1d4ed8;
+}
+.quiz-answer-btn:hover {
+    background-color: #60a5fa;
+}
+.quiz-answer-btn:active {
+    box-shadow: 0 2px 0 #1d4ed8;
+}
+
+/* Стилизация таблицы лидеров */
+table {
+    background-color: #1f2937;
+    border: 3px solid #ffcc00 !important;
+    margin: 20px auto 0 auto;
+    width: 100%;
+    max-width: 400px;
+    border-collapse: collapse;
+}
+th {
+    background-color: #374151 !important;
+    color: #ffcc00 !important;
+    padding: 12px;
+    font-size: 16px;
+    border-bottom: 2px solid #4b5563;
+}
+td {
+    color: #ffffff !important;
+    padding: 12px;
+    font-size: 15px;
+    border-bottom: 1px solid #374151;
+}
+
+/* Желтая пунктирная подсветка строки игрока */
+.player-row {
+    outline: 3px dashed #ffcc00;
+    outline-offset: -3px;
+    background-color: #2d3748;
+}
+
+/* НАСТРОЙКИ ДЛЯ МОБИЛЬНЫХ ТЕЛЕФОНОВ */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 28px;
     }
-});
-
-// --- 3. ПРОМОКОДЫ ---
-document.getElementById('promo-btn').addEventListener('click', () => {
-    const input = document.getElementById('promo-input').value.trim().toLowerCase();
-    const msg = document.getElementById('promo-msg');
     
-    if (input === 'brawl2026') {
-        gold += 500;
-        msg.style.color = '#4ade80';
-        msg.textContent = 'Промокод успешно активирован! +500 золота!';
-        updateUI();
-    } else {
-        msg.style.color = '#ef4444';
-        msg.textContent = 'Неверный или устаревший промокод.';
+    .menu button {
+        display: inline-block;
+        width: 45%;
+        font-size: 14px;
+        padding: 10px 5px;
+        margin: 4px;
     }
-    document.getElementById('promo-input').value = '';
-});
-
-// --- 4. РАЗДЕЛ БОЙЦОВ ---
-const brawlersData = [
-    { name: "Шелли", cost: 50, gps: 1, owned: false },
-    { name: "Кольт", cost: 200, gps: 5, owned: false },
-    { name: "Эль Примо", cost: 1000, gps: 30, owned: false }
-];
-
-const brawlersList = document.getElementById('brawlers-list');
-
-function renderBrawlers() {
-    brawlersList.innerHTML = '';
-    brawlersData.forEach((brawler, index) => {
-        const card = document.createElement('div');
-        card.className = `brawler-card ${brawler.owned ? '' : 'locked'}`;
-        
-        // Создаем кнопку или текст владения в зависимости от состояния
-        let actionButtonOrText = brawler.owned ? 
-            '<span style="color:#4ade80;font-weight:bold;display:block;margin-top:10px;">В команде</span>' : 
-            `<button data-index="${index}" class="buy-brawler-btn">Нанять (${brawler.cost} зол.)</button>`;
-
-        card.innerHTML = `
-            <h3>${brawler.name}</h3>
-            <p>Доход: +${brawler.gps} зол/сек</p>
-            ${actionButtonOrText}
-        `;
-        brawlersList.appendChild(card);
-    });
-
-    // Навешиваем обработчики на кнопки покупки бойцов
-    document.querySelectorAll('.buy-brawler-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const index = e.target.getAttribute('data-index');
-            buyBrawler(index);
-        });
-    });
-}
-
-function buyBrawler(index) {
-    let brawler = brawlersData[index];
-    if (gold >= brawler.cost) {
-        gold -= brawler.cost;
-        brawler.owned = true;
-        gps += brawler.gps;
-        renderBrawlers();
-        updateUI();
-    } else {
-        alert('Недостаточно золота для найма бойца!');
+    
+    button {
+        max-width: 280px;
     }
 }
-renderBrawlers();
-
-// --- 5. ВИКТОРИНА (с поддержкой класса .quiz-answer-btn) ---
-const quizData = [
-    { q: "Кто является начальным бойцом в игре?", a: ["Кольт", "Шелли", "Нита"], right: 1 },
-    { q: "Какая редкая валюта используется для покупки скинов и бойцов?", a: ["Гемы", "Жетоны", "Стар Поинты"], right: 0 }
-];
-let currentQuestion = 0;
-
-function loadQuestion() {
-    if (currentQuestion >= quizData.length) {
-        document.getElementById('questionText').textContent = "Викторина пройдена!";
-        document.getElementById('answersBlock').innerHTML = "<p style='color: #4ade80; font-weight: bold;'>Вы ответили на все вопросы! +100 золота за эрудицию!</p>";
-        gold += 100;
-        updateUI();
-        return;
-    }
-    let qObj = quizData[currentQuestion];
-    document.getElementById('questionText').textContent = qObj.q;
-    
-    const answersBlock = document.getElementById('answersBlock');
-    answersBlock.innerHTML = '';
-    qObj.a.forEach((ans, idx) => {
-        const btn = document.createElement('button');
-        btn.textContent = ans;
-        btn.className = 'quiz-answer-btn'; // Применяем твой класс из CSS
-        btn.onclick = () => {
-            if (idx === qObj.right) {
-                alert("Правильно!");
-                currentQuestion++;
-                loadQuestion();
-            } else {
-                alert("Неправильно, попробуй еще раз!");
-            }
-        };
-        answersBlock.appendChild(btn);
-    });
-}
-document.getElementById('restart-quiz-btn').addEventListener('click', () => {
-    currentQuestion = 0;
-    loadQuestion();
-});
-loadQuestion();
-
-// --- 6. ТОП ИГРОКОВ (с поддержкой подсвеченной строки .player-row) ---
-const leaderboard = [
-    { name: "Ice_Cream_BS", gold: 99999, isPlayer: false },
-    { name: "Leon_Pro", gold: 75000, isPlayer: false },
-    { name: "Ты (Текущая сессия)", gold: 0, isPlayer: true }
-];
-
-function renderLeaderboard() {
-    const tbody = document.getElementById('leaderboard-body');
-    tbody.innerHTML = '';
-    
-    // Обновляем золото текущего игрока
-    const playerObj = leaderboard.find(p => p.isPlayer);
-    if (playerObj) playerObj.gold = Math.floor(gold);
-    
-    // Сортируем топ по убыванию золота
-    const sorted = [...leaderboard].sort((a,b) => b.gold - a.gold);
-
-    sorted.forEach((player, idx) => {
-        const row = document.createElement('tr');
-        
-        // Если это строка игрока, добавляем твой класс .player-row для рамки
-        if (player.isPlayer) {
-            row.className = 'player-row';
-        }
-
-        row.innerHTML = `
-            <td>${idx + 1}</td>
-            <td>${player.name}</td>
-            <td>${player.gold}</td>
-        `;
-        tbody.appendChild(row);
-    });
-}
-document.getElementById('top-btn').addEventListener('click', renderLeaderboard);
