@@ -26,7 +26,7 @@ let upgradeCost = 15;
 let currentQuestionIndex = 0;
 let activeQuestions = [];
 
-// Данные виртуальных соперников (их золото теперь динамическое)
+// Данные виртуальных соперников
 let onlinePlayers = [
     { name: "Magician_BS", gold: 95400, isBot: true },
     { name: "CyberLeon", gold: 82100, isBot: true },
@@ -88,7 +88,7 @@ topBtn.addEventListener('click', () => {
     clickSection.style.display = 'none';
     brawlersSection.style.display = 'none';
     topSection.style.display = 'block';
-    renderLeaderboard(); // Перерисовываем топ с учетом вашего места
+    renderLeaderboard();
 });
 
 // 4. ЛОГИКА КЛИКЕРА
@@ -206,29 +206,23 @@ function checkAnswer(selectedIndex) {
     loadQuestion();
 }
 
-// ДИНАМИЧЕСКИЙ ТОП ИГРОКОВ (Генерация таблицы лидеров)
+// ДИНАМИЧЕСКИЙ ТОП ИГРОКОВ
 function renderLeaderboard() {
     const tbody = document.querySelector('table tbody');
     if (!tbody) return;
     
-    // Создаем общий список, добавляя туда вас
     let allEntries = [...onlinePlayers, { name: "Вы (Игрок)", gold: gold, isBot: false }];
-    
-    // Сортируем всех по убыванию золота
     allEntries.sort((a, b) => b.gold - a.gold);
     
     tbody.innerHTML = "";
     
     allEntries.forEach((player, index) => {
         const tr = document.createElement('tr');
-        
-        // Красивые иконки мест
         let place = index + 1;
         if (place === 1) place = "🥇 1";
         else if (place === 2) place = "🥈 2";
         else if (place === 3) place = "🥉 3";
         
-        // Подсвечиваем строку игрока желтым пунктиром, если это он
         if (!player.isBot) {
             tr.style.backgroundColor = "rgba(255, 204, 0, 0.15)";
             tr.style.border = "2px dashed #ffcc00";
@@ -243,13 +237,11 @@ function renderLeaderboard() {
     });
 }
 
-// Симуляция живой игры: боты фармят золото каждую секунду
+// Симуляция живой игры ботов
 setInterval(() => {
     onlinePlayers.forEach(bot => {
-        // Каждый бот получает случайное количество золота от 5 до 25 в секунду
         bot.gold += Math.floor(Math.random() * 20) + 5;
     });
-    // Если вкладка топа открыта прямо сейчас — обновляем циферки на лету
     if (topSection.style.display === 'block') {
         renderLeaderboard();
     }
@@ -268,3 +260,17 @@ function loadGame() {
         gold = parseInt(localStorage.getItem('gold'));
         goldPerClick = parseInt(localStorage.getItem('goldPerClick'));
         upgradeCost = parseInt(localStorage.getItem('upgradeCost'));
+        const savedBrawlers = localStorage.getItem('brawlers_data');
+        if (savedBrawlers) {
+            brawlers = JSON.parse(savedBrawlers);
+        }
+    }
+    counter.textContent = gold;
+    updateClickPower();
+    upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
+}
+
+// 8. ЗАПУСК ИГРЫ
+loadGame();
+prepareQuestions();
+loadQuestion();
