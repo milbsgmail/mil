@@ -6,13 +6,18 @@ const clickActionBtn = document.getElementById('click-action-btn');
 
 const quizBtn = document.getElementById('quiz-btn');
 const brawlerBtn = document.getElementById('brawler-btn');
+const clickBtn = document.getElementById('click-btn');
+const topBtn = document.getElementById('top-btn');
+
 const quizSection = document.getElementById('quiz-section');
 const clickSection = document.getElementById('click-section');
 const brawlersSection = document.getElementById('brawlers-section');
+const topSection = document.getElementById('top-section');
 const brawlersList = document.getElementById('brawlers-list');
 
 const questionText = document.getElementById('questionText');
 const answersBlock = document.getElementById('answersBlock');
+const playerGoldTxt = document.getElementById('player-gold');
 
 // 2. ИСХОДНЫЕ ДАННЫЕ ИГРЫ
 let gold = 0;
@@ -36,7 +41,7 @@ let brawlers = [
     { name: "Леон", level: 1, baseCost: 6400, bonus: 600 }
 ];
 
-// Уменьшенная база вопросов (всего 5 штук, чтобы файл точно сохранился!)
+// Уменьшенная база вопросов
 const allQuizQuestions = [
     { question: "Кто является начальным бойцом в Brawl Stars?", answers: ["Шелли", "Кольт", "Нита", "Брок"], correct: 0 },
     { question: "Какая редкость у бойца Леон?", answers: ["Редкий", "Эпический", "Легендарный", "Мифический"], correct: 2 },
@@ -47,7 +52,7 @@ const allQuizQuestions = [
 
 function prepareQuestions() {
     let shuffled = [...allQuizQuestions].sort(() => 0.5 - Math.random());
-    activeQuestions = shuffled.slice(0, 5); // Выбираем все 5 вопросов
+    activeQuestions = shuffled.slice(0, 5);
     currentQuestionIndex = 0;
 }
 
@@ -56,19 +61,32 @@ quizBtn.addEventListener('click', () => {
     quizSection.style.display = 'block';
     clickSection.style.display = 'none';
     brawlersSection.style.display = 'none';
+    topSection.style.display = 'none';
 });
 
-document.getElementById('click-btn').addEventListener('click', () => {
+clickBtn.addEventListener('click', () => {
     quizSection.style.display = 'none';
     clickSection.style.display = 'block';
     brawlersSection.style.display = 'none';
+    topSection.style.display = 'none';
 });
 
 brawlerBtn.addEventListener('click', () => {
     quizSection.style.display = 'none';
     clickSection.style.display = 'none';
     brawlersSection.style.display = 'block';
+    topSection.style.display = 'none';
     renderBrawlers();
+});
+
+topBtn.addEventListener('click', () => {
+    quizSection.style.display = 'none';
+    clickSection.style.display = 'none';
+    brawlersSection.style.display = 'none';
+    topSection.style.display = 'block';
+    if(playerGoldTxt) {
+        playerGoldTxt.textContent = gold.toLocaleString();
+    }
 });
 
 // 4. ЛОГИКА КЛИКЕРА
@@ -120,19 +138,14 @@ function renderBrawlers() {
     brawlers.forEach((brawler, index) => {
         let cost = Math.round(brawler.baseCost * Math.pow(1.6, brawler.level - 1));
         const card = document.createElement('div');
-        card.style.border = "2px solid #4b5563";
-        card.style.borderRadius = "8px";
-        card.style.padding = "15px";
-        card.style.textAlign = "center";
-        card.style.backgroundColor = "#1f2937";
-        card.style.color = "white";
+        card.className = "brawler-card";
 
         card.innerHTML = `
-            <h3 style="margin: 0 0 5px 0; color: #3b82f6;">${brawler.name}</h3>
+            <h3 style="margin: 0 0 5px 0; color: #ffcc00;">${brawler.name}</h3>
             <p style="margin: 5px 0;">Уровень: <span style="color: #4ade80; font-weight:bold;">${brawler.level}</span></p>
             <p style="margin: 5px 0; font-size:13px; opacity:0.9;">Даёт к клику: +${(brawler.level - 1) * brawler.bonus} золота</p>
-            <button id="up-brawler-${index}" style="margin-top: 10px; padding: 6px 12px; cursor: pointer; border-radius: 4px; border: none; font-weight: bold;">
-                Прокачать: ${cost} Золота
+            <button id="up-brawler-${index}" style="margin-top: 10px; width: 90%;">
+                Прокачать: ${cost}
             </button>
         `;
         brawlersList.appendChild(card);
@@ -141,10 +154,11 @@ function renderBrawlers() {
         if (gold < cost) {
             upBtn.style.backgroundColor = "#4b5563";
             upBtn.style.color = "#9ca3af";
+            upBtn.style.boxShadow = "none";
             upBtn.style.cursor = "not-allowed";
         } else {
-            upBtn.style.backgroundColor = "#eab308";
-            upBtn.style.color = "#000";
+            upBtn.style.backgroundColor = "#ffcc00";
+            upBtn.style.color = "#000000";
         }
 
         upBtn.addEventListener('click', () => {
@@ -170,15 +184,6 @@ function loadQuestion() {
         currentQuestion.answers.forEach((answer, index) => {
             const btn = document.createElement('button');
             btn.textContent = answer;
-            btn.style.backgroundColor = "#3b82f6";
-            btn.style.color = "white";
-            btn.style.margin = "5px";
-            btn.style.padding = "10px 20px";
-            btn.style.border = "none";
-            btn.style.borderRadius = "6px";
-            btn.style.cursor = "pointer";
-            btn.style.fontSize = "16px";
-            
             btn.addEventListener('click', () => checkAnswer(index));
             answersBlock.appendChild(btn);
         });
@@ -212,15 +217,17 @@ function loadGame() {
         gold = parseInt(localStorage.getItem('gold'));
         goldPerClick = parseInt(localStorage.getItem('goldPerClick'));
         upgradeCost = parseInt(localStorage.getItem('upgradeCost'));
-        let savedBrawlers = localStorage.getItem('brawlers_data');
-        if(savedBrawlers) { brawlers = JSON.parse(savedBrawlers); }
-        counter.textContent = gold;
-        upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
+        const savedBrawlers = localStorage.getItem('brawlers_data');
+        if (savedBrawlers) {
+            brawlers = JSON.parse(savedBrawlers);
+        }
     }
+    counter.textContent = gold;
     updateClickPower();
+    upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
 }
 
-// ЗАПУСК ИГРЫ
+// 8. ЗАПУСК ИГРЫ
 loadGame();
 prepareQuestions();
 loadQuestion();
