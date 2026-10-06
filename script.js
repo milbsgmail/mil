@@ -135,21 +135,36 @@ promoBtn.addEventListener('click', () => {
     }
 
     if (code === "BRAWL") {
-        gold += 5000; promoMsg.style.color = "#4ade80"; promoMsg.textContent = "Успешно! Получено +5,000 золота!";
+        gold += 5000; 
+        promoMsg.style.color = "#4ade80"; 
+        promoMsg.textContent = "Успешно! Получено +5,000 золота!";
     } else if (code === "GOLD") {
-        gold += 50000; promoMsg.style.color = "#4ade80"; promoMsg.textContent = "Супер-код! Получено +50,000 золота!";
+        gold += 50000; 
+        promoMsg.style.color = "#4ade80"; 
+        promoMsg.textContent = "Супер-код! Получено +50,000 золота!";
     } else if (code === "DEV100") {
-        gold += 1000000; promoMsg.style.color = "#a855f7"; promoMsg.textContent = "Режим Создателя! Вы получили 1,000,000 золота! 👑";
+        gold += 1000000; 
+        promoMsg.style.color = "#a855f7"; 
+        promoMsg.textContent = "Режим Создателя! Вы получили 1,000,000 золота! 👑";
     } else if (code === "SHELLYUP") {
-        brawlers[0].level += 5; promoMsg.style.color = "#3b82f6"; promoMsg.textContent = "Шелли прокачалась сразу на +5 уровней! 🔥";
+        brawlers[0].level += 5; 
+        promoMsg.style.color = "#3b82f6"; 
+        promoMsg.textContent = "Шелли прокачалась сразу на +5 уровней! 🔥";
     } else if (code === "COLTUP") {
-        brawlers[1].level += 5; promoMsg.style.color = "#ec4899"; promoMsg.textContent = "Кольт прокачался сразу на +5 уровней! 🔫";
+        brawlers[1].level += 5; 
+        promoMsg.style.color = "#ec4899"; 
+        promoMsg.textContent = "Кольт прокачался сразу на +5 уровней! 🔫";
     } else if (code === "SHAKHTA") {
-        goldPerClick += 20; promoMsg.style.color = "#fb923c"; promoMsg.textContent = "Шахтерский бонус! Сила клика увеличена на +20! ⛏️";
+        goldPerClick += 20; 
+        promoMsg.style.color = "#fb923c"; 
+        promoMsg.textContent = "Шахтерский бонус! Сила клика увеличена на +20! ⛏️";
     } else if (code === "FREECOINS") {
-        gold += 1500; promoMsg.style.color = "#eab308"; promoMsg.textContent = "Монетки в кармане! Получено +1,500 золота! 🪙";
+        gold += 1500; 
+        promoMsg.style.color = "#eab308"; 
+        promoMsg.textContent = "Монетки в кармане! Получено +1,500 золота! 🪙";
     } else {
-        promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Такого промокода не существует!"; 
+        promoMsg.style.color = "#ef4444"; 
+        promoMsg.textContent = "Такого промокода не существует!"; 
         return;
     }
 
@@ -252,9 +267,3 @@ function renderLeaderboard() {
 }
 
 // ПАССИВНЫЙ ДОХОД И ФАРМ БОТОВ (КАЖДУЮ СЕКУНДУ)
-setInterval(() => {
-    let income = getPassiveIncome();
-    if (income > 0) {
-        gold += income;
-        counter.textContent = Math.floor(gold);
-    }
