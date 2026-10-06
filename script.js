@@ -100,7 +100,7 @@ function updateClickPower() {
 
 clickActionBtn.addEventListener('click', () => {
     gold += (goldPerClick + getBonusPower());
-    counter.textContent = gold;
+    counter.textContent = Math.floor(gold);
     saveGame();
 });
 
@@ -109,7 +109,7 @@ upgradeBtn.addEventListener('click', () => {
         gold -= upgradeCost; 
         goldPerClick += 1; 
         upgradeCost = Math.round(upgradeCost * 1.5);
-        counter.textContent = gold; 
+        counter.textContent = Math.floor(gold); 
         updateClickPower();
         upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
         saveGame();
@@ -154,7 +154,7 @@ promoBtn.addEventListener('click', () => {
     }
 
     usedPromocodes.push(code);
-    counter.textContent = gold;
+    counter.textContent = Math.floor(gold);
     updateClickPower();
     promoInput.value = "";
     saveGame();
@@ -180,7 +180,7 @@ function renderBrawlers() {
             if (gold >= cost) {
                 gold -= cost; 
                 b.level += 1; 
-                counter.textContent = gold;
+                counter.textContent = Math.floor(gold);
                 saveGame(); 
                 updateClickPower(); 
                 renderBrawlers();
@@ -208,7 +208,7 @@ function loadQuestion() {
             btn.addEventListener('click', () => {
                 if (i === q.correct) { 
                     gold += 500; 
-                    counter.textContent = gold; 
+                    counter.textContent = Math.floor(gold); 
                     saveGame(); 
                 }
                 currentQuestionIndex++; 
@@ -259,4 +259,3 @@ setInterval(() => {
         counter.textContent = Math.floor(gold);
     }
     
-    onlinePlayers.forEach(p => {
