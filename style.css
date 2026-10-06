@@ -68,6 +68,23 @@ button:active {
     text-align: center;
 }
 
+/* Кнопки ответов в викторине */
+.quiz-answer-btn {
+    display: block;
+    width: 80%;
+    max-width: 400px;
+    margin: 10px auto;
+    background-color: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 4px 0 #1d4ed8;
+}
+.quiz-answer-btn:hover {
+    background-color: #60a5fa;
+}
+.quiz-answer-btn:active {
+    box-shadow: 0 2px 0 #1d4ed8;
+}
+
 /* Стилизация таблицы лидеров */
 table {
     background-color: #1f2937;
@@ -89,6 +106,13 @@ td {
     padding: 12px;
     font-size: 15px;
     border-bottom: 1px solid #374151;
+}
+
+/* Желтая пунктирная подсветка строки игрока */
+.player-row {
+    outline: 3px dashed #ffcc00;
+    outline-offset: -3px;
+    background-color: #2d3748;
 }
 
 /* НАСТРОЙКИ ДЛЯ МОБИЛЬНЫХ ТЕЛЕФОНОВ */
