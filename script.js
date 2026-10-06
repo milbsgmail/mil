@@ -25,9 +25,8 @@ let gold = 0, goldPerClick = 1, upgradeCost = 15, currentQuestionIndex = 0, acti
 let onlinePlayers = [{ name: "Magician_BS", gold: 95400 }, { name: "CyberLeon", gold: 82100 }, { name: "BrawlMaster", gold: 74500 }];
 let usedPromocodes = [];
 
-// Эталонная база бойцов (у Шелли начальный уровень 1, и пассивный доход зависит от уровня)
 const defaultBrawlers = [
-    { name: "Шелли", level: 1, baseCost: 10, bonus: 1, bonus_passive: 2 }, // За каждый уровень выше 1-го даёт +2 золота/сек
+    { name: "Шелли", level: 1, baseCost: 10, bonus: 1, bonus_passive: 2 },
     { name: "Кольт", level: 1, baseCost: 35, bonus: 2, bonus_passive: 5 },
     { name: "Нита", level: 1, baseCost: 80, bonus: 4, bonus_passive: 12 },
     { name: "Эль Примо", level: 1, baseCost: 180, bonus: 8, bonus_passive: 25 },
@@ -63,12 +62,9 @@ topBtn.addEventListener('click', () => { switchTab(topSection); renderLeaderboar
 function getBonusPower() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0);
 }
-
-// Расчет общего пассивного дохода от всех купленных бойцов (включая Шелли)
 function getPassiveIncome() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0), 0);
 }
-
 function updateClickPower() {
     clickPowerTxt.textContent = goldPerClick + getBonusPower();
     cpsDisplay.textContent = `В секунду: +${getPassiveIncome()} золота`;
@@ -90,22 +86,36 @@ upgradeBtn.addEventListener('click', () => {
     }
 });
 
-// ПРОМОКОДЫ
+// ПРОМОКОДЫ (Обновленная секция: добавлены 5 новых промокодов)
 promoBtn.addEventListener('click', () => {
     const code = promoInput.value.trim().toUpperCase();
     if (code === "") { promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Введите код!"; return; }
     if (usedPromocodes.includes(code)) { promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Вы уже активировали этот промокод!"; return; }
 
+    // Старые коды
     if (code === "BRAWL") {
         gold += 5000; promoMsg.style.color = "#4ade80"; promoMsg.textContent = "Успешно! Получено +5,000 золота!";
     } else if (code === "GOLD") {
         gold += 50000; promoMsg.style.color = "#4ade80"; promoMsg.textContent = "Супер-код! Получено +50,000 золота!";
+    } 
+    // НОВЫЕ КОДЫ (5 ШТУК)
+    else if (code === "DEV100") {
+        gold += 1000000; promoMsg.style.color = "#a855f7"; promoMsg.textContent = "Режим Создателя! Вы получили 1,000,000 золота! 👑";
+    } else if (code === "SHELLYUP") {
+        brawlers[0].level += 5; promoMsg.style.color = "#3b82f6"; promoMsg.textContent = "Шелли прокачалась сразу на +5 уровней! 🔥";
+    } else if (code === "COLTUP") {
+        brawlers[1].level += 5; promoMsg.style.color = "#ec4899"; promoMsg.textContent = "Кольт прокачался сразу на +5 уровней! 🔫";
+    } else if (code === "SHAKHTA") {
+        goldPerClick += 20; promoMsg.style.color = "#fb923c"; promoMsg.textContent = "Шахтерский бонус! Сила клика увеличена на +20! ⛏️";
+    } else if (code === "FREECOINS") {
+        gold += 1500; promoMsg.style.color = "#eab308"; promoMsg.textContent = "Монетки в кармане! Получено +1,500 золота! 🪙";
     } else {
         promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Такого промокода не существует!"; return;
     }
 
     usedPromocodes.push(code);
     counter.textContent = gold;
+    updateClickPower();
     promoInput.value = "";
     saveGame();
 });
@@ -196,19 +206,3 @@ function saveGame() {
 function loadGame() {
     if(localStorage.getItem('gold')) {
         gold = parseInt(localStorage.getItem('gold')); goldPerClick = parseInt(localStorage.getItem('goldPerClick'));
-        upgradeCost = parseInt(localStorage.getItem('upgradeCost'));
-        
-        let savedData = JSON.parse(localStorage.getItem('brawlers_data') || "[]");
-        brawlers = defaultBrawlers.map((defB, idx) => {
-            let savedB = savedData[idx];
-            return savedB ? { ...defB, level: savedB.level } : defB;
-        });
-
-        usedPromocodes = JSON.parse(localStorage.getItem('used_promos') || "[]");
-    }
-    counter.textContent = gold; updateClickPower();
-    upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
-}
-loadGame();
-activeQuestions = [...allQuizQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
-loadQuestion();
