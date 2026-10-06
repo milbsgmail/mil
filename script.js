@@ -56,7 +56,7 @@ function prepareQuestions() {
     currentQuestionIndex = 0;
 }
 
-// 3. ЛОГИКА ГЛАВНОГО МЕНЮ
+// 3. ЛОГИКА ГЛАВНОГО МЕНЮ (ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК)
 quizBtn.addEventListener('click', () => {
     quizSection.style.display = 'block';
     clickSection.style.display = 'none';
@@ -83,8 +83,10 @@ topBtn.addEventListener('click', () => {
     quizSection.style.display = 'none';
     clickSection.style.display = 'none';
     brawlersSection.style.display = 'none';
-    topSection.style.display = 'block';
-    if(playerGoldTxt) {
+    topSection.style.display = 'block'; // Показываем секцию топа
+    
+    // Обновляем золото игрока в таблице лидеров при переходе на вкладку
+    if (playerGoldTxt) {
         playerGoldTxt.textContent = gold.toLocaleString();
     }
 });
@@ -98,17 +100,20 @@ function getBonusPower() {
     return extraPower;
 }
 
+// Обновление общего показателя силы клика в UI
 function updateClickPower() {
     let totalPower = goldPerClick + getBonusPower();
     clickPowerTxt.textContent = totalPower;
 }
 
+// Само действие клика по кнопке "Клик!"
 clickActionBtn.addEventListener('click', () => {
     gold += (goldPerClick + getBonusPower());
     counter.textContent = gold;
     saveGame();
 });
 
+// Покупка апгрейда "Шахты"
 upgradeBtn.addEventListener('click', () => {
     if (gold >= upgradeCost) {
         gold -= upgradeCost;
@@ -227,7 +232,7 @@ function loadGame() {
     upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
 }
 
-// 8. ЗАПУСК ИГРЫ
+// 8. ЗАПУСК ИГРЫ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
 loadGame();
 prepareQuestions();
 loadQuestion();
