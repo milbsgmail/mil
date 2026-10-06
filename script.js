@@ -333,3 +333,4 @@ setInterval(() => {
 
 // Запуск игры
 loadGame();
+
