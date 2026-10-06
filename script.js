@@ -86,20 +86,17 @@ upgradeBtn.addEventListener('click', () => {
     }
 });
 
-// ПРОМОКОДЫ (Обновленная секция: добавлены 5 новых промокодов)
+// ПРОМОКОДЫ
 promoBtn.addEventListener('click', () => {
     const code = promoInput.value.trim().toUpperCase();
     if (code === "") { promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Введите код!"; return; }
     if (usedPromocodes.includes(code)) { promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Вы уже активировали этот промокод!"; return; }
 
-    // Старые коды
     if (code === "BRAWL") {
         gold += 5000; promoMsg.style.color = "#4ade80"; promoMsg.textContent = "Успешно! Получено +5,000 золота!";
     } else if (code === "GOLD") {
         gold += 50000; promoMsg.style.color = "#4ade80"; promoMsg.textContent = "Супер-код! Получено +50,000 золота!";
-    } 
-    // НОВЫЕ КОДЫ (5 ШТУК)
-    else if (code === "DEV100") {
+    } else if (code === "DEV100") {
         gold += 1000000; promoMsg.style.color = "#a855f7"; promoMsg.textContent = "Режим Создателя! Вы получили 1,000,000 золота! 👑";
     } else if (code === "SHELLYUP") {
         brawlers[0].level += 5; promoMsg.style.color = "#3b82f6"; promoMsg.textContent = "Шелли прокачалась сразу на +5 уровней! 🔥";
@@ -206,3 +203,5 @@ function saveGame() {
 function loadGame() {
     if(localStorage.getItem('gold')) {
         gold = parseInt(localStorage.getItem('gold')); goldPerClick = parseInt(localStorage.getItem('goldPerClick'));
+        upgradeCost = parseInt(localStorage.getItem('upgradeCost'));
+        
