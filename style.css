@@ -1,4 +1,4 @@
-/* Геймерский темный фон */
+/* Р“РµР№РјРµСЂСЃРєРёР№ С‚РµРјРЅС‹Р№ С„РѕРЅ */
 body {
     background-color: #111827;
     color: #ffffff;
@@ -6,17 +6,17 @@ body {
     text-align: center;
     padding: 20px;
     margin: 0;
-    touch-action: manipulation; /* Отключает приближение при двойном клике на телефоне */
+    touch-action: manipulation; /* РћС‚РєР»СЋС‡Р°РµС‚ РїСЂРёР±Р»РёР¶РµРЅРёРµ РїСЂРё РґРІРѕР№РЅРѕРј РєР»РёРєРµ РЅР° С‚РµР»РµС„РѕРЅРµ */
 }
 
-/* Стилизация заголовка */
+/* РЎС‚РёР»РёР·Р°С†РёСЏ Р·Р°РіРѕР»РѕРІРєР° */
 h1 {
     color: #ffcc00;
     font-size: 36px;
     margin-bottom: 5px;
 }
 
-/* Общий стиль для кнопок в стилистике Brawl Stars */
+/* РћР±С‰РёР№ СЃС‚РёР»СЊ РґР»СЏ РєРЅРѕРїРѕРє РІ СЃС‚РёР»РёСЃС‚РёРєРµ Brawl Stars */
 button {
     background-color: #ffcc00;
     color: #000000;
@@ -31,13 +31,19 @@ button {
     transition: transform 0.1s, background-color 0.1s;
 }
 
-/* Анимация кнопок при наведении */
+/* РђРЅРёРјР°С†РёСЏ РєРЅРѕРїРѕРє РїСЂРё РЅР°РІРµРґРµРЅРёРё */
 button:hover {
     background-color: #ffe680;
     transform: scale(1.05);
 }
 
-/* Акцент на кнопке кликера */
+/* Р­С„С„РµРєС‚ РЅР°Р¶Р°С‚РёСЏ РєРЅРѕРїРѕРє */
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 0 #cc9900;
+}
+
+/* РђРєС†РµРЅС‚ РЅР° РєРЅРѕРїРєРµ РєР»РёРєРµСЂР° */
 #click-action-btn {
     background-color: #ff4500;
     color: #ffffff;
@@ -48,55 +54,56 @@ button:hover {
 #click-action-btn:hover {
     background-color: #ff6347;
 }
+#click-action-btn:active {
+    box-shadow: 0 2px 0 #b33000;
+}
 
-/* Карточки бойцов */
+/* РљР°СЂС‚РѕС‡РєРё Р±РѕР№С†РѕРІ */
 .brawler-card {
     background-color: #1f2937; 
     border: 3px solid #ffcc00; 
     border-radius: 12px; 
     padding: 15px; 
-    width: 250px;
     box-sizing: border-box;
+    text-align: center;
 }
 
-/* Стилизация таблицы лидеров */
+/* РЎС‚РёР»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹ Р»РёРґРµСЂРѕРІ */
 table {
     background-color: #1f2937;
     border: 3px solid #ffcc00 !important;
     margin: 20px auto 0 auto;
     width: 100%;
     max-width: 400px;
+    border-collapse: collapse;
 }
 th {
     background-color: #374151 !important;
     color: #ffcc00 !important;
-    padding: 10px;
+    padding: 12px;
+    font-size: 16px;
 }
 td {
     color: #ffffff !important;
-    padding: 10px;
+    padding: 12px;
+    font-size: 14px;
 }
 
-/* НАСТРОЙКИ ДЛЯ МОБИЛЬНЫХ ТЕЛЕФОНОВ */
+/* РќРђРЎРўР РћР™РљР Р”Р›РЇ РњРћР‘РР›Р¬РќР«РҐ РўР•Р›Р•Р¤РћРќРћР’ */
 @media (max-width: 600px) {
     h1 {
         font-size: 28px;
     }
     
-    button {
-        display: block;
-        width: 100%;
-        max-width: 280px;
-        margin: 10px auto;
-        box-sizing: border-box;
+    .menu button {
+        display: inline-block;
+        width: 45%;
+        font-size: 14px;
+        padding: 10px 5px;
+        margin: 4px;
     }
     
-    #click-action-btn {
-        max-width: 200px;
-    }
-
-    .brawler-card {
-        width: 100%;
+    button {
         max-width: 280px;
     }
 }
