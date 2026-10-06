@@ -25,7 +25,6 @@
         <div style="font-size: 24px; color: #ffcc00; font-weight: bold;">
             Золото: <span id="gold-count">0</span>
         </div>
-        <!-- Индикатор пассивного дохода -->
         <div id="cps-display" style="font-size: 16px; color: #4ade80; margin-top: 5px;">
             В секунду: +0 золота
         </div>
@@ -37,6 +36,13 @@
         <div style="margin-top: 20px;">
             <button id="upgrade-btn">Купить Шахту (Цена: 15 золота)</button>
             <p style="font-size: 14px; opacity: 0.8;">Сейчас даёт за клик: <span id="click-power">1</span> золота</p>
+        </div>
+
+        <!-- Поле для ввода промокодов -->
+        <div style="margin-top: 30px; border-top: 1px dashed #4b5563; padding-top: 15px;">
+            <input type="text" id="promo-input" placeholder="Введите промокод" style="padding: 10px; border-radius: 8px; border: 2px solid #ffcc00; background: #1f2937; color: white; font-weight: bold; text-align: center; font-size: 14px;">
+            <button id="promo-btn" style="padding: 10px 15px; font-size: 14px; margin-left: 5px;">Активировать</button>
+            <p id="promo-msg" style="font-size: 13px; margin-top: 5px; font-weight: bold;"></p>
         </div>
     </div>
 
