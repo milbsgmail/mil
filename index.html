@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бравл-Клаб</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Подключаем логику кнопок -->
     <script src="script.js" defer></script>
 </head>
 <body>
@@ -15,9 +14,9 @@
 
     <!-- Главное меню -->
     <div class="menu">
+        <button id="click-btn">Кликер</button>
         <button id="brawler-btn">Бойцы</button>
         <button id="quiz-btn">Викторина</button>
-        <button id="click-btn">Кликер</button>
         <button id="top-btn">Топ игроков</button>
     </div>
 
@@ -28,28 +27,64 @@
         </div>
         
         <div style="margin-top: 20px;">
-            <button id="click-action-btn" style="background-color: #ff4500; color: white; padding: 15px 30px; cursor: pointer; border: none; border-radius: 8px; font-size: 18px; font-weight: bold;">Клик!</button>
+            <button id="click-action-btn">Клик!</button>
         </div>
 
         <div style="margin-top: 20px;">
-            <button id="upgrade-btn" style="padding: 10px 20px; cursor: pointer; transition: background-color 0.3s;">Купить Шахту (Цена: 15 золота)</button>
+            <button id="upgrade-btn">Купить Шахту (Цена: 15 золота)</button>
             <p style="font-size: 14px; opacity: 0.8;">Сейчас даёт за клик: <span id="click-power">1</span> золота</p>
         </div>
     </div>
 
-    <!-- Раздел Викторины (изначально скрыт) -->
-    <div id="quiz-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px; display: none;">
+    <!-- Раздел Викторины -->
+    <div id="quiz-section" style="margin-top: 30px; border-top: 1px solid #4b5563; padding-top: 20px; display: none;">
         <h2 id="questionText">Вопросы загружаются...</h2>
         <div id="answersBlock"></div>
     </div>
 
-    <!-- Раздел Бойцов (изначально скрыт) -->
-    <div id="brawlers-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px; display: none;">
+    <!-- Раздел Бойцов -->
+    <div id="brawlers-section" style="margin-top: 30px; border-top: 1px solid #4b5563; padding-top: 20px; display: none;">
         <h2>Ваша команда бойцов</h2>
         <p style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">Прокачивайте бойцов, чтобы увеличивать силу клика!</p>
-        <div id="brawlers-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-            <!-- Бойцы будут создаваться автоматически через JavaScript -->
+        <div id="brawlers-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; justify-content: center; padding: 10px;">
+            <!-- Создается через JS -->
         </div>
+    </div>
+
+    <!-- Раздел Топа игроков -->
+    <div id="top-section" style="margin-top: 30px; border-top: 1px solid #4b5563; padding-top: 20px; display: none;">
+        <h2>Топ игроков клуба</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Место</th>
+                    <th>Игрок</th>
+                    <th>Золото</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>🥇 1</td>
+                    <td>Magician_BS</td>
+                    <td>95,400</td>
+                </tr>
+                <tr>
+                    <td>🥈 2</td>
+                    <td>CyberLeon</td>
+                    <td>82,100</td>
+                </tr>
+                <tr>
+                    <td>🥉 3</td>
+                    <td>BrawlMaster</td>
+                    <td>74,500</td>
+                </tr>
+                <tr style="border-top: 2px dashed #ffcc00;">
+                    <td>Вы</td>
+                    <td id="player-name">Игрок</td>
+                    <td id="player-gold">0</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
 </body>
