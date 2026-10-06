@@ -147,11 +147,11 @@ promoBtn.addEventListener('click', () => {
         promoMsg.style.color = "#a855f7"; 
         promoMsg.textContent = "Режим Создателя! Вы получили 1,000,000 золота! 👑";
     } else if (code === "SHELLYUP") {
-        brawlers[0].level += 5; 
+        brawlers[0].level += 5; // Фикс тут
         promoMsg.style.color = "#3b82f6"; 
         promoMsg.textContent = "Шелли прокачалась сразу на +5 уровней! 🔥";
     } else if (code === "COLTUP") {
-        brawlers[1].level += 5; 
+        brawlers[1].level += 5; // Фикс тут
         promoMsg.style.color = "#ec4899"; 
         promoMsg.textContent = "Кольт прокачался сразу на +5 уровней! 🔫";
     } else if (code === "SHAKHTA") {
@@ -264,4 +264,3 @@ function renderLeaderboard() {
         row.innerHTML = `
             <td>${idx + 1}</td>
             <td>${player.name}</td>
-ф
