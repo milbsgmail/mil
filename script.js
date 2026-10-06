@@ -1,6 +1,7 @@
 // 1. ЭЛЕМЕНТЫ СТРАНИЦЫ
 const counter = document.getElementById('gold-count');
 const clickPowerTxt = document.getElementById('click-power');
+const cpsDisplay = document.getElementById('cps-display'); // Элемент пассивного дохода
 const upgradeBtn = document.getElementById('upgrade-btn');
 const clickActionBtn = document.getElementById('click-action-btn');
 const quizBtn = document.getElementById('quiz-btn');
@@ -19,12 +20,18 @@ const answersBlock = document.getElementById('answersBlock');
 let gold = 0, goldPerClick = 1, upgradeCost = 15, currentQuestionIndex = 0, activeQuestions = [];
 let onlinePlayers = [{ name: "Magician_BS", gold: 95400 }, { name: "CyberLeon", gold: 82100 }, { name: "BrawlMaster", gold: 74500 }];
 
+// Изменили баланс бойцов: теперь они дают И к клику, И пассивный доход (bonus_passive) в секунду!
 let brawlers = [
-    { name: "Шелли", level: 1, baseCost: 10, bonus: 1 }, { name: "Кольт", level: 1, baseCost: 25, bonus: 2 },
-    { name: "Нита", level: 1, baseCost: 50, bonus: 4 }, { name: "Эль Примо", level: 1, baseCost: 100, bonus: 8 },
-    { name: "Поко", level: 1, baseCost: 200, bonus: 15 }, { name: "Рико", level: 1, baseCost: 400, bonus: 30 },
-    { name: "Джесси", level: 1, baseCost: 800, bonus: 60 }, { name: "Пайпер", level: 1, baseCost: 1600, bonus: 120 },
-    { name: "Мортис", level: 1, baseCost: 3200, bonus: 250 }, { name: "Леон", level: 1, baseCost: 6400, bonus: 600 }
+    { name: "Шелли", level: 1, baseCost: 10, bonus: 1, bonus_passive: 1 },
+    { name: "Кольт", level: 1, baseCost: 35, bonus: 2, bonus_passive: 3 },
+    { name: "Нита", level: 1, baseCost: 80, bonus: 4, bonus_passive: 8 },
+    { name: "Эль Примо", level: 1, baseCost: 180, bonus: 8, bonus_passive: 15 },
+    { name: "Поко", level: 1, baseCost: 350, bonus: 15, bonus_passive: 35 },
+    { name: "Рико", level: 1, baseCost: 700, bonus: 30, bonus_passive: 75 },
+    { name: "Джесси", level: 1, baseCost: 1400, bonus: 60, bonus_passive: 160 },
+    { name: "Пайпер", level: 1, baseCost: 2900, bonus: 120, bonus_passive: 350 },
+    { name: "Мортис", level: 1, baseCost: 6000, bonus: 250, bonus_passive: 800 },
+    { name: "Леон", level: 1, baseCost: 12500, bonus: 600, bonus_passive: 2000 }
 ];
 
 const allQuizQuestions = [
@@ -49,14 +56,23 @@ topBtn.addEventListener('click', () => { switchTab(topSection); renderLeaderboar
 function getBonusPower() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0);
 }
+
+// Расчет общего пассивного дохода от всех купленных бойцов
+function getPassiveIncome() {
+    return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0), 0);
+}
+
 function updateClickPower() {
     clickPowerTxt.textContent = goldPerClick + getBonusPower();
+    cpsDisplay.textContent = `В секунду: +${getPassiveIncome()} золота`;
 }
+
 clickActionBtn.addEventListener('click', () => {
     gold += (goldPerClick + getBonusPower());
     counter.textContent = gold;
     saveGame();
 });
+
 upgradeBtn.addEventListener('click', () => {
     if (gold >= upgradeCost) {
         gold -= upgradeCost; goldPerClick += 1; upgradeCost = Math.round(upgradeCost * 1.5);
@@ -78,8 +94,9 @@ function renderBrawlers() {
         card.className = "brawler-card";
         card.innerHTML = `
             <h3>${b.name}</h3><p>Уровень: <b>${b.level}</b></p>
-            <p style="font-size:12px;">+${(b.level - 1) * b.bonus} к клику</p>
-            <button id="up-brawler-${i}" style="width:90%; background:${gold < cost ? '#4b5563':'#ffcc00'}">Прокачать: ${cost}</button>
+            <p style="font-size:12px; margin: 2px 0;">+${(b.level - 1) * b.bonus} к клику</p>
+            <p style="font-size:12px; color: #4ade80; margin: 2px 0;">+${(b.level - 1) * b.bonus_passive}/сек пассивно</p>
+            <button id="up-brawler-${i}" style="width:90%; margin-top: 8px; background:${gold < cost ? '#4b5563':'#ffcc00'}">Прокачать: ${cost}</button>
         `;
         brawlersList.appendChild(card);
         document.getElementById(`up-brawler-${i}`).addEventListener('click', () => {
@@ -119,17 +136,39 @@ function renderLeaderboard() {
     tbody.innerHTML = "";
     all.forEach((p, i) => {
         const tr = document.createElement('tr');
-        if (p.isPlayer) tr.style.backgroundColor = "rgba(255, 204, 0, 0.2)";
-        tr.innerHTML = `<td>${i + 1}</td><td>${p.name}</td><td>${p.gold.toLocaleString()}</td>`;
+        
+        let place = i + 1;
+        if (place === 1) place = "🥇 1";
+        else if (place === 2) place = "🥈 2";
+        else if (place === 3) place = "🥉 3";
+        
+        if (p.isPlayer) {
+            tr.style.backgroundColor = "rgba(255, 204, 0, 0.15)";
+            tr.style.outline = "2px dashed #ffcc00";
+        }
+        tr.innerHTML = `<td>${place}</td><td style="${p.isPlayer ? 'color: #ffcc00; font-weight: bold;':''}">${p.name}</td><td>${p.gold.toLocaleString()}</td>`;
         tbody.appendChild(tr);
     });
 }
+
+// ГЛАВНЫЙ ИГРОВОЙ ТАЙМЕР (Каждую секунду начисляет золото)
 setInterval(() => {
+    // 1. Начисляем золото игроку от пассивного дохода бойцов
+    let passiveIncome = getPassiveIncome();
+    if (passiveIncome > 0) {
+        gold += passiveIncome;
+        counter.textContent = gold;
+        saveGame();
+    }
+
+    // 2. Начисляем случайное золото ботам-соперникам
     onlinePlayers.forEach(b => b.gold += Math.floor(Math.random() * 20) + 5);
+    
+    // 3. Перерисовываем топ на лету, если открыта вкладка рейтинга
     if (topSection.style.display === 'block') renderLeaderboard();
 }, 1000);
 
-// 8. СОХРАНЕНИЕ
+// 8. СОХРАНЕНИЕ И ЗАГРУЗКА
 function saveGame() {
     localStorage.setItem('gold', gold); localStorage.setItem('goldPerClick', goldPerClick);
     localStorage.setItem('upgradeCost', upgradeCost); localStorage.setItem('brawlers_data', JSON.stringify(brawlers));
