@@ -99,10 +99,9 @@ function getBonusPower() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0);
 }
 
-// Изменено на стрелочную функцию, чтобы не дублировать объявления
-const getPassiveIncome = () => {
+function getPassiveIncome() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0), 0);
-};
+}
 
 function updateClickPower() {
     if (clickPowerTxt) clickPowerTxt.textContent = goldPerClick + getBonusPower();
@@ -164,11 +163,11 @@ if (promoBtn) {
             promoMsg.style.color = "#a855f7"; 
             promoMsg.textContent = "Режим Создателя! Вы получили 1,000,000 золота! 👑";
         } else if (code === "SHELLYUP") {
-            brawlers[0].level += 5; 
+            if (brawlers[0]) brawlers[0].level += 5; 
             promoMsg.style.color = "#3b82f6"; 
             promoMsg.textContent = "Шелли прокачалась сразу на +5 уровней! 🔥";
         } else if (code === "COLTUP") {
-            brawlers[1].level += 5; 
+            if (brawlers[1]) brawlers[1].level += 5; 
             promoMsg.style.color = "#ec4899"; 
             promoMsg.textContent = "Кольт прокачался сразу на +5 уровней! 🔫";
         } else if (code === "SHAKHTA") {
@@ -258,3 +257,4 @@ function loadQuestion() {
 function checkAnswer(selectedIndex) {
     const currentQ = activeQuestions[currentQuestionIndex];
     if (selectedIndex === currentQ.correct) {
+        gold += 100;
