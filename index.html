@@ -50,6 +50,9 @@
     <div id="quiz-section" style="margin-top: 30px; border-top: 1px solid #4b5563; padding-top: 20px; display: none;">
         <h2 id="questionText">Вопросы загружаются...</h2>
         <div id="answersBlock"></div>
+        <div style="margin-top: 20px;">
+            <button id="restart-quiz-btn">Начать викторину заново</button>
+        </div>
     </div>
 
     <!-- Раздел Бойцов -->
@@ -72,7 +75,7 @@
                     <th>Золото</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="leaderboard-body">
                 <!-- Таблица лидеров заполняется динамически через JS -->
             </tbody>
         </table>
