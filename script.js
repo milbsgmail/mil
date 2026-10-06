@@ -200,7 +200,109 @@ function saveGame() {
     localStorage.setItem('upgradeCost', upgradeCost); localStorage.setItem('brawlers_data', JSON.stringify(brawlers));
     localStorage.setItem('used_promos', JSON.stringify(usedPromocodes));
 }
+// 6. ВИКТОРИНА (продолжение)
+function loadQuestion() {
+    answersBlock.innerHTML = "";
+    if (restartQuizBtn) restartQuizBtn.style.display = "none";
+
+    if (currentQuestionIndex >= activeQuestions.length) {
+        questionText.textContent = "Викторина завершена! Вы ответили на все вопросы. 🎉";
+        return;
+    }
+
+    const currentQ = activeQuestions[currentQuestionIndex];
+    questionText.textContent = `Вопрос ${currentQuestionIndex + 1}: ${currentQ.question}`;
+
+    currentQ.answers.forEach((answer, index) => {
+        const btn = document.createElement('button');
+        btn.textContent = answer;
+        btn.className = "quiz-answer-btn";
+        btn.addEventListener('click', () => checkAnswer(index));
+        answersBlock.appendChild(btn);
+    });
+}
+
+function checkAnswer(selectedIndex) {
+    const currentQ = activeQuestions[currentQuestionIndex];
+    if (selectedIndex === currentQ.correct) {
+        gold += 100;
+        counter.textContent = Math.floor(gold);
+        alert("Правильно! +100 золота! 🎉");
+    } else {
+        alert("Неправильно! Попробуйте в следующий раз. 😢");
+    }
+    currentQuestionIndex++;
+    loadQuestion();
+}
+
+if (restartQuizBtn) {
+    restartQuizBtn.addEventListener('click', () => {
+        initQuiz();
+    });
+}
+
+// 7. ТАБЛИЦА ЛИДЕРОВ
+function renderLeaderboard() {
+    if (!leaderboardBody) return;
+    leaderboardBody.innerHTML = "";
+    
+    let allPlayers = [...onlinePlayers, { name: "Вы (Игрок)", gold: Math.floor(gold) }];
+    allPlayers.sort((a, b) => b.gold - a.gold);
+
+    allPlayers.forEach((player, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${player.name}</td>
+            <td>${player.gold.toLocaleString()} 🪙</td>
+        `;
+        leaderboardBody.appendChild(row);
+    });
+}
+
+// 8. СОХРАНЕНИЕ И ЗАГРУЗКА ИГРЫ
+function saveGame() {
+    const gameData = {
+        gold: gold,
+        goldPerClick: goldPerClick,
+        upgradeCost: upgradeCost,
+        brawlers: brawlers,
+        usedPromocodes: usedPromocodes
+    };
+    localStorage.setItem('brawlClickerSave', JSON.stringify(gameData));
+}
+
 function loadGame() {
+    const savedData = localStorage.getItem('brawlClickerSave');
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        gold = data.gold || 0;
+        goldPerClick = data.goldPerClick || 1;
+        upgradeCost = data.upgradeCost || 15;
+        brawlers = data.brawlers || JSON.parse(JSON.stringify(defaultBrawlers));
+        usedPromocodes = data.usedPromocodes || [];
+    }
+    
+    if (counter) counter.textContent = Math.floor(gold);
+    if (upgradeBtn) upgradeBtn.textContent = 'Купить Шахту (Цена: ' + upgradeCost + ' золота)';
+    updateClickPower();
+}
+
+// 9. ПАССИВНЫЙ ДОХОД И АВТОСОХРАНЕНИЕ
+setInterval(() => {
+    let passive = getPassiveIncome();
+    if (passive > 0) {
+        gold += passive;
+        if (counter) counter.textContent = Math.floor(gold);
+        if (topSection && topSection.style.display === 'block') {
+            renderLeaderboard();
+        }
+    }
+}, 1000);
+
+// Старт игры при загрузке страницы
+loadGame();
+ {
     if(localStorage.getItem('gold')) {
         gold = parseInt(localStorage.getItem('gold')); goldPerClick = parseInt(localStorage.getItem('goldPerClick'));
         upgradeCost = parseInt(localStorage.getItem('upgradeCost'));
