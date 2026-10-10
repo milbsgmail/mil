@@ -154,6 +154,6 @@ setInterval(() => {
     gold += getPassiveIncome(); onlinePlayers.forEach(p => { p.gold += Math.floor(Math.random() * 300) + 50; }); counter.textContent = Math.floor(gold);
     if (topSection.style.display !== 'none' && !topSection.classList.contains('hidden')) renderLeaderboard();
 }, 1000);
-setInterval(saveGame, 15000);
 
-// 9. СОХРАНЕНИЯ
+// 9. СОХРАНЕНИЯ В LOCALSTORAGE
+function saveGame() { 
