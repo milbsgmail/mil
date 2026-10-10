@@ -22,8 +22,8 @@ const leaderboardBody = document.getElementById('leaderboard-body');
 
 // 2. ИГРОВЫЕ ДАННЫЕ
 let gold = 0, goldPerClick = 1, upgradeCost = 15, currentQuestionIndex = 0;
-let activeQuestions = [];
-let usedPromocodes = [];
+let activeQuestions = new Array();
+let usedPromocodes = new Array();
 let onlinePlayers = [
     { name: "Magician_BS", gold: 95400 },
     { name: "CyberLeon", gold: 82100 },
@@ -156,4 +156,4 @@ setInterval(() => {
 }, 1000);
 
 // 9. СИСТЕМА СОХРАНЕНИЙ
-function saveGame() { 
+function saveGame() {
