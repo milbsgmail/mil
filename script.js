@@ -98,7 +98,6 @@ promoBtn.addEventListener('click', () => {
     else { promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Такого промокода не существует!"; return; }
     usedPromocodes.push(code); promoInput.value = ""; updateUI(); saveGame();
 });
-
 // 6. БОЙЦЫ
 function renderBrawlers() {
     brawlersList.innerHTML = "";
@@ -155,5 +154,24 @@ setInterval(() => {
     if (topSection.style.display !== 'none' && !topSection.classList.contains('hidden')) renderLeaderboard();
 }, 1000);
 
-// 9. СИСТЕМА СОХРАНЕНИЙ С БЕЗОПАСНЫМ СИНТАКСИСОМ
+// 9. СИСТЕМА СОХРАНЕНИЙ
 function saveGame() {
+    const obj = { g: gold, gpc: goldPerClick, uc: upgradeCost, up: usedPromocodes, br: brawlers, op: onlinePlayers };
+    localStorage.setItem('brawl_club_save_v2', JSON.stringify(obj));
+}
+
+function loadGame() {
+    const saved = localStorage.getItem('brawl_club_save_v2');
+    if (saved) {
+        try {
+            const d = JSON.parse(saved);
+            gold = d.g || 0; goldPerClick = d.gpc || 1; upgradeCost = d.uc || 15;
+            usedPromocodes = d.up || new Array();
+            if (d.br) brawlers = d.br; if (d.op) onlinePlayers = d.op;
+        } catch (e) { console.error(e); }
+    }
+    updateUI();
+}
+
+setInterval(saveGame, 15000);
+loadGame();
