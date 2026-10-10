@@ -22,8 +22,8 @@ const leaderboardBody = document.getElementById('leaderboard-body');
 
 // 2. ИГРОВЫЕ ДАННЫЕ
 let gold = 0, goldPerClick = 1, upgradeCost = 15, currentQuestionIndex = 0;
-let activeQuestions = [];
-let usedPromocodes = [];
+let activeQuestions = new Array();
+let usedPromocodes = new Array();
 let onlinePlayers = [
     { name: "Magician_BS", gold: 95400 },
     { name: "CyberLeon", gold: 82100 },
@@ -98,6 +98,7 @@ promoBtn.addEventListener('click', () => {
     else { promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Такого промокода не существует!"; return; }
     usedPromocodes.push(code); promoInput.value = ""; updateUI(); saveGame();
 });
+
 // 6. БОЙЦЫ
 function renderBrawlers() {
     brawlersList.innerHTML = "";
@@ -156,103 +157,3 @@ setInterval(() => {
 
 // 9. СИСТЕМА СОХРАНЕНИЙ
 function saveGame() { 
-    localStorage.setItem('brawl_club_save', JSON.stringify({ gold, goldPerClick, upgradeCost, usedPromocodes, brawlers, onlinePlayers })); 
-}
-
-function loadGame() {
-    const saved = localStorage.getItem('brawl_club_save');
-    if (saved) {
-        try {
-            const d = JSON.parse(saved); 
-            gold = d.gold || 0; 
-            goldPerClick = d.goldPerClick || 1; 
-            upgradeCost = d.upgradeCost || 15; 
-            usedPromocodes = d.usedPromocodes || [];
-            if (d.brawlers) brawlers = d.brawlers; 
-            if (d.onlinePlayers) onlinePlayers = d.onlinePlayers;
-        } catch (e) { console.error(e); }
-    }
-    updateUI();
-}
-
-setInterval(saveGame, 15000);
-loadGame();
-// 6. БОЙЦЫ
-function renderBrawlers() {
-    brawlersList.innerHTML = "";
-    brawlers.forEach((b, i) => {
-        let cost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
-        const card = document.createElement('div'); card.className = "brawler-card";
-        card.innerHTML = `<h3 class="brawler-name">${b.name}</h3><div class="brawler-level">Уровень: <b>${b.level}</b></div><div class="brawler-stats"><div>💥 Клик: +${(b.level - 1) * b.bonus}</div><div>⏱️ Пассив: +${(b.level - 1) * b.bonus_passive}/с</div></div><button id="up-brawler-${i}" class="menu-btn brawler-up-btn">Прокачать: ${cost}</button>`;
-        brawlersList.appendChild(card);
-        const upBtn = document.getElementById(`up-brawler-${i}`);
-        if (gold < cost) upBtn.style.opacity = "0.6";
-        upBtn.addEventListener('click', () => {
-            if (gold >= cost) { gold -= cost; b.level += 1; saveGame(); updateUI(); renderBrawlers(); }
-            else { const o = upBtn.textContent; upBtn.textContent = "Недостаточно золота!"; setTimeout(() => { upBtn.textContent = `Прокачать: ${cost}`; }, 1000); }
-        });
-    });
-}
-
-// 7. ВИКТОРИНА
-function initQuiz() { activeQuestions = [...allQuizQuestions].sort(() => 0.5 - Math.random()).slice(0, 5); currentQuestionIndex = 0; loadQuestion(); }
-function loadQuestion() {
-    if (currentQuestionIndex < activeQuestions.length) {
-        let q = activeQuestions[currentQuestionIndex]; questionText.textContent = `Вопрос ${currentQuestionIndex + 1} из 5: ${q.question}`; answersBlock.innerHTML = "";
-        const feedback = document.createElement('div'); feedback.style.fontSize = "16px"; feedback.style.fontWeight = "bold"; feedback.style.marginTop = "15px";
-        q.answers.forEach((ans, i) => {
-            const btn = document.createElement('button'); btn.className = "quiz-ans-btn"; btn.textContent = ans;
-            btn.addEventListener('click', () => {
-                answersBlock.querySelectorAll('.quiz-ans-btn').forEach(b => b.disabled = true);
-                if (i === q.correct) { gold += 10; feedback.style.color = "#4ade80"; feedback.textContent = "Правильно! +10 золота! 🎉"; updateUI(); saveGame(); }
-                else { feedback.style.color = "#ef4444"; feedback.textContent = `Неверно! Ответ: ${q.answers[q.correct]} ❌`; }
-                setTimeout(() => { currentQuestionIndex++; loadQuestion(); }, 1500);
-            });
-            answersBlock.appendChild(btn);
-        });
-        answersBlock.appendChild(feedback);
-    } else {
-        questionText.innerHTML = "🎉 Викторина окончена!"; answersBlock.innerHTML = "";
-        const rBtn = document.createElement('button'); rBtn.className = "action-btn"; rBtn.textContent = "Начать заново"; rBtn.addEventListener('click', initQuiz); answersBlock.appendChild(rBtn);
-    }
-}
-
-// 8. ТОП ИГРОКОВ И ТАЙМЕРЫ
-function renderLeaderboard() {
-    leaderboardBody.innerHTML = "";
-    let records = [{ name: "Вы", gold: Math.floor(gold), isPlayer: true }, ...onlinePlayers.map(p => ({ name: p.name, gold: Math.floor(p.gold), isPlayer: false }))];
-    records.sort((a, b) => b.gold - a.gold);
-    records.forEach((p, idx) => {
-        const tr = document.createElement('tr'); if (p.isPlayer) tr.className = "current-player";
-        tr.innerHTML = `<td>${idx + 1}</td><td>${p.name}</td><td>${p.gold} 🪙</td>`; leaderboardBody.appendChild(tr);
-    });
-}
-
-setInterval(() => {
-    gold += getPassiveIncome(); onlinePlayers.forEach(p => { p.gold += Math.floor(Math.random() * 300) + 50; }); counter.textContent = Math.floor(gold);
-    if (topSection.style.display !== 'none' && !topSection.classList.contains('hidden')) renderLeaderboard();
-}, 1000);
-
-// 9. СИСТЕМА СОХРАНЕНИЙ
-function saveGame() { 
-    localStorage.setItem('brawl_club_save', JSON.stringify({ gold, goldPerClick, upgradeCost, usedPromocodes, brawlers, onlinePlayers })); 
-}
-
-function loadGame() {
-    const saved = localStorage.getItem('brawl_club_save');
-    if (saved) {
-        try {
-            const d = JSON.parse(saved); 
-            gold = d.gold || 0; 
-            goldPerClick = d.goldPerClick || 1; 
-            upgradeCost = d.upgradeCost || 15; 
-            usedPromocodes = d.usedPromocodes || new Array();
-            if (d.brawlers) brawlers = d.brawlers; 
-            if (d.onlinePlayers) onlinePlayers = d.onlinePlayers;
-        } catch (e) { console.error(e); }
-    }
-    updateUI();
-}
-
-setInterval(saveGame, 15000);
-loadGame();
