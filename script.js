@@ -219,7 +219,6 @@ function loadQuestion() {
         questionText.textContent = `Вопрос ${currentQuestionIndex + 1} из 5: ${q.question}`;
         answersBlock.innerHTML = "";
         
-        // Создаем контейнер для статусных текстовых сообщений (вместо alert)
         const feedbackMsg = document.createElement('div');
         feedbackMsg.style.fontSize = "16px";
         feedbackMsg.style.fontWeight = "bold";
@@ -231,7 +230,6 @@ function loadQuestion() {
             btn.className = "quiz-ans-btn";
             btn.textContent = ans;
             btn.addEventListener('click', () => {
-                // Блокируем остальные кнопки во время анимации ответа
                 const allButtons = answersBlock.querySelectorAll('.quiz-ans-btn');
                 allButtons.forEach(b => b.disabled = true);
 
@@ -246,3 +244,8 @@ function loadQuestion() {
                     feedbackMsg.textContent = `Неверно! Правильный ответ: ${q.answers[q.correct]} ❌`;
                 }
 
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }, 1500);
+            });
