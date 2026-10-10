@@ -208,7 +208,6 @@ function renderBrawlers() {
 
 // 8. СИСТЕМА ВИКТОРИНЫ
 function initQuiz() {
-    // Перемешиваем и берем 5 случайных вопросов
     activeQuestions = [...allQuizQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
     currentQuestionIndex = 0;
     loadQuestion();
@@ -220,36 +219,30 @@ function loadQuestion() {
         questionText.textContent = `Вопрос ${currentQuestionIndex + 1} из 5: ${q.question}`;
         answersBlock.innerHTML = "";
         
+        // Создаем контейнер для статусных текстовых сообщений (вместо alert)
+        const feedbackMsg = document.createElement('div');
+        feedbackMsg.style.fontSize = "16px";
+        feedbackMsg.style.fontWeight = "bold";
+        feedbackMsg.style.marginTop = "15px";
+        feedbackMsg.style.minHeight = "24px";
+        
         q.answers.forEach((ans, i) => {
             const btn = document.createElement('button');
             btn.className = "quiz-ans-btn";
             btn.textContent = ans;
             btn.addEventListener('click', () => {
+                // Блокируем остальные кнопки во время анимации ответа
+                const allButtons = answersBlock.querySelectorAll('.quiz-ans-btn');
+                allButtons.forEach(b => b.disabled = true);
+
                 if (i === q.correct) {
                     gold += 10;
+                    feedbackMsg.style.color = "#4ade80";
+                    feedbackMsg.textContent = "Правильно! +10 золота! 🎉";
                     updateUI();
                     saveGame();
+                } else {
+                    feedbackMsg.style.color = "#ef4444";
+                    feedbackMsg.textContent = `Неверно! Правильный ответ: ${q.answers[q.correct]} ❌`;
                 }
-                currentQuestionIndex++;
-                loadQuestion();
-            });
-            answersBlock.appendChild(btn);
-        });
-    } else {
-        questionText.innerHTML = "🎉 Викторина окончена! Вы ответили на все вопросы. Хотите сыграть снова?";
-        answersBlock.innerHTML = "";
-        const restartBtn = document.createElement('button');
-        restartBtn.className = "action-btn";
-        restartBtn.textContent = "Начать заново";
-        restartBtn.addEventListener('click', initQuiz);
-        answersBlock.appendChild(restartBtn);
-    }
-}
 
-// 9. ЖИВОЙ ТОП ИГРОКОВ (ЛИДЕРБОРД)
-function renderLeaderboard() {
-    leaderboardBody.innerHTML = "";
-    
-    // Формируем общий список лидеров с участием реального игрока
-    let allRecords = [
-        { name: "Вы", gold: Math.floor(gold), isPlayer: true },
