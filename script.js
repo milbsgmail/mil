@@ -155,5 +155,5 @@ setInterval(() => {
     if (topSection.style.display !== 'none' && !topSection.classList.contains('hidden')) renderLeaderboard();
 }, 1000);
 
-// 9. СИСТЕМА СОХРАНЕНИЙ
+// 9. СИСТЕМА СОХРАНЕНИЙ С БЕЗОПАСНЫМ СИНТАКСИСОМ
 function saveGame() {
