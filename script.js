@@ -80,6 +80,7 @@ function getBonusPower() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0);
 }
 
+// Пассивный доход капает от всех бойцов выше 1 уровня (включая Шелли после её прокачки)
 function getPassiveIncome() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0), 0);
 }
@@ -246,6 +247,3 @@ function loadQuestion() {
 
                 setTimeout(() => {
                     currentQuestionIndex++;
-                    loadQuestion();
-                }, 1500);
-            });
