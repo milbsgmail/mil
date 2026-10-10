@@ -98,7 +98,6 @@ promoBtn.addEventListener('click', () => {
     else { promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Такого промокода не существует!"; return; }
     usedPromocodes.push(code); promoInput.value = ""; updateUI(); saveGame();
 });
-
 // 6. БОЙЦЫ
 function renderBrawlers() {
     brawlersList.innerHTML = "";
@@ -155,5 +154,26 @@ setInterval(() => {
     if (topSection.style.display !== 'none' && !topSection.classList.contains('hidden')) renderLeaderboard();
 }, 1000);
 
-// 9. СОХРАНЕНИЯ В LOCALSTORAGE
+// 9. СИСТЕМА СОХРАНЕНИЙ
 function saveGame() { 
+    localStorage.setItem('brawl_club_save', JSON.stringify({ gold, goldPerClick, upgradeCost, usedPromocodes, brawlers, onlinePlayers })); 
+}
+
+function loadGame() {
+    const saved = localStorage.getItem('brawl_club_save');
+    if (saved) {
+        try {
+            const d = JSON.parse(saved); 
+            gold = d.gold || 0; 
+            goldPerClick = d.goldPerClick || 1; 
+            upgradeCost = d.upgradeCost || 15; 
+            usedPromocodes = d.usedPromocodes || [];
+            if (d.brawlers) brawlers = d.brawlers; 
+            if (d.onlinePlayers) onlinePlayers = d.onlinePlayers;
+        } catch (e) { console.error(e); }
+    }
+    updateUI();
+}
+
+setInterval(saveGame, 15000);
+loadGame();
