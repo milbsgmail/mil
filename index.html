@@ -20,8 +20,16 @@
         <button id="top-btn">Топ игроков</button>
     </div>
 
+    <!-- Кастомная система уведомлений (Brawl-Alert) -->
+    <div id="custom-alert-container" class="alert-container"></div>
+
     <!-- Раздел Кликера -->
     <div id="click-section" style="margin-top: 20px;">
+        <!-- Мегабокс (Ежедневный бонус) -->
+        <div style="margin-bottom: 20px;">
+            <button id="megabox-btn" class="megabox-btn">🎁 Открыть Мегабокс!</button>
+        </div>
+
         <div style="font-size: 24px; color: #ffcc00; font-weight: bold;">
             Золото: <span id="gold-count">0</span>
         </div>
@@ -32,6 +40,8 @@
         <!-- Контейнер для фиксации правильных координат вылетающих цифр -->
         <div class="click-area-container" style="margin-top: 20px; display: inline-block; position: relative;">
             <button id="click-action-btn">Клик!</button>
+            <!-- Индикатор ульты -->
+            <div id="ult-timer" class="ult-timer-bar" style="display: none;"></div>
         </div>
 
         <div style="margin-top: 20px;">
