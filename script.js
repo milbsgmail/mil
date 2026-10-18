@@ -49,16 +49,16 @@ let onlinePlayers = [
 ];
 
 const defaultBrawlers = [
-    { name: "Шелли", level: 1, baseCost: 10, bonus: 1, bonus_passive: 2 },
-    { name: "Кольт", level: 1, baseCost: 35, bonus: 2, bonus_passive: 5 },
-    { name: "Нита", level: 1, baseCost: 80, bonus: 4, bonus_passive: 12 },
-    { name: "Эль Примо", level: 1, baseCost: 180, bonus: 8, bonus_passive: 25 },
-    { name: "Поко", level: 1, baseCost: 350, bonus: 15, bonus_passive: 50 },
-    { name: "Рико", level: 1, baseCost: 700, bonus: 30, bonus_passive: 100 },
-    { name: "Джесси", level: 1, baseCost: 1400, bonus: 60, bonus_passive: 220 },
-    { name: "Пайпер", level: 1, baseCost: 2900, bonus: 120, bonus_passive: 450 },
-    { name: "Мортис", level: 1, baseCost: 6000, bonus: 250, bonus_passive: 900 },
-    { name: "Леон", level: 1, baseCost: 12500, bonus: 600, bonus_passive: 2500 }
+    { name: "Шелли", level: 1, baseCost: 10, bonus: 1, bonus_passive: 2, icon: "🤠" },
+    { name: "Кольт", level: 1, baseCost: 35, bonus: 2, bonus_passive: 5, icon: "🔫" },
+    { name: "Нита", level: 1, baseCost: 80, bonus: 4, bonus_passive: 12, icon: "🐻" },
+    { name: "Эль Примо", level: 1, baseCost: 180, bonus: 8, bonus_passive: 25, icon: "💪" },
+    { name: "Поко", level: 1, baseCost: 350, bonus: 15, bonus_passive: 50, icon: "💀" },
+    { name: "Рико", level: 1, baseCost: 700, bonus: 30, bonus_passive: 100, icon: "🤖" },
+    { name: "Джесси", level: 1, baseCost: 1400, bonus: 60, bonus_passive: 220, icon: "🛠️" },
+    { name: "Пайпер", level: 1, baseCost: 2900, bonus: 120, bonus_passive: 450, icon: "☂️" },
+    { name: "Мортис", level: 1, baseCost: 6000, bonus: 250, bonus_passive: 900, icon: "🦇" },
+    { name: "Леон", level: 1, baseCost: 12500, bonus: 600, bonus_passive: 2500, icon: "🦎" }
 ];
 
 let brawlers = JSON.parse(JSON.stringify(defaultBrawlers));
@@ -101,6 +101,7 @@ function getBonusPower() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0);
 }
 
+// По правилам: пассивный доход начисляется, только если уровень бойца больше 1.
 function getPassiveIncome() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0), 0);
 }
@@ -115,7 +116,6 @@ function updateUI() {
 
 // 6. КЛИКЕР, УЛЬТА И УЛУЧШЕНИЯ
 clickActionBtn.addEventListener('click', (event) => {
-    // Проверка на активацию ульты
     if (isUltReady && !isUltActive) {
         activateUlt();
     }
@@ -157,7 +157,6 @@ setInterval(() => {
         clickActionBtn.classList.add('ult-ready');
         showBrawlAlert("⚡ СУПЕР-КЛИК ГОТОВ! Нажми на кнопку клика!");
         
-        // Если за 4 секунды не нажал — ульта сгорает
         setTimeout(() => {
             if (isUltReady && !isUltActive) {
                 isUltReady = false;
@@ -171,7 +170,7 @@ function activateUlt() {
     isUltReady = false;
     isUltActive = true;
     let oldMultiplier = ultMultiplier;
-    ultMultiplier = 5; // Множитель клика х5
+    ultMultiplier = 5;
     clickActionBtn.classList.remove('ult-ready');
     clickActionBtn.classList.add('ult-active');
     ultTimer.style.display = 'block';
@@ -201,14 +200,13 @@ function activateUlt() {
 if (megaboxBtn) {
     megaboxBtn.addEventListener('click', () => {
         const now = Date.now();
-        // Раз в минуту для тестов
         if (now - lastMegaboxTime < 60000) {
             const remains = Math.ceil((60000 - (now - lastMegaboxTime)) / 1000);
             showBrawlAlert(`Box заблокирован! Подожди еще ${remains} сек.`);
             return;
         }
 
-        const prize = Math.floor(Math.random() * 4501) + 500; // От 500 до 5000 монет
+        const prize = Math.floor(Math.random() * 4501) + 500;
         gold += prize;
         lastMegaboxTime = now;
         
@@ -261,7 +259,7 @@ promoBtn.addEventListener('click', () => {
         showBrawlAlert("Получено +5,000 золота!");
     } else if (code === "GOLD") {
         gold += 50000;
-        showBrawlAlert("Получено +5,0000 золота!");
+        showBrawlAlert("Получено +50,000 золота!");
     } else if (code === "DEV100") {
         gold += 1000000;
         showBrawlAlert("Режим Создателя! +1,000,000 золота! 👑");
