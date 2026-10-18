@@ -173,11 +173,11 @@ promoBtn.addEventListener('click', () => {
         promoMsg.style.color = "#a855f7";
         promoMsg.textContent = "Режим Создателя! Получено +1,000,000 золота! 👑";
     } else if (code === "SHELLYUP") {
-        brawlers[0].level += 5;
+        if(brawlers[0]) brawlers[0].level += 5;
         promoMsg.style.color = "#3b82f6";
         promoMsg.textContent = "Шелли прокачалась сразу на +5 уровней! 🔥";
     } else if (code === "COLTUP") {
-        brawlers[1].level += 5;
+        if(brawlers[1]) brawlers[1].level += 5;
         promoMsg.style.color = "#ec4899";
         promoMsg.textContent = "Кольт прокачался сразу на +5 уровней! 🔫";
     } else if (code === "SHAKHTA") {
@@ -247,18 +247,22 @@ function renderLeaderboard() {
     
     tableBody.innerHTML = "";
     
-    // Создаем копию ботов и добавляем реального игрока
     let allPlayers = [...onlinePlayers, { name: "Вы (Игрок)", gold: gold }];
-    
-    // Сортируем игроков по золоту от большего к меньшему
     allPlayers.sort((a, b) => b.gold - a.gold);
     
     allPlayers.forEach((player, index) => {
         const row = document.createElement('tr');
-        // Выделяем строку текущего игрока золотым цветом
         if (player.name === "Вы (Игрок)") {
             row.style.color = "#ffcc00";
             row.style.fontWeight = "bold";
         }
         row.innerHTML = `
             <td>${index + 1}</td>
+            <td>${player.name}</td>
+            <td>${Math.floor(player.gold)}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+// 9. ВИКТОРИНА
