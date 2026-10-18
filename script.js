@@ -5,7 +5,7 @@ function saveGame() {
         goldPerClick: goldPerClick,
         upgradeCost: upgradeCost,
         usedPromocodes: usedPromocodes,
-        brawlers: brawlers.map(b => { return { name: b.name, level: b.level }; }),
+        brawlers: brawlers.map(b => ({ name: b.name, level: b.level })),
         onlinePlayers: onlinePlayers,
         lastMegaboxTime: lastMegaboxTime
     }));
@@ -124,10 +124,10 @@ topBtn.addEventListener('click', () => { switchTab(topSection); renderLeaderboar
 
 // 4. МЕХАНИКА РАСЧЕТОВ КЛИКА И ПАССИВА
 function getBonusPower() {
-    return brawlers.reduce((sum, b) => { return sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0); }, 0);
+    return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0);
 }
 function getPassiveIncome() {
-    return brawlers.reduce((sum, b) => { return sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0); }, 0);
+    return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0), 0);
 }
 
 // 5. ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
@@ -209,7 +209,6 @@ function activateUlt() {
     requestAnimationFrame(step);
 }
 
-// Покупка апгрейда «Шахта»
 if (upgradeBtn) {
     upgradeBtn.addEventListener('click', () => {
         if (gold >= upgradeCost) {
@@ -217,10 +216,10 @@ if (upgradeBtn) {
             goldPerClick += 1;
             upgradeCost = Math.round(upgradeCost * 1.5);
             updateUI();
-            showBrawlAlert("⚒️ Шахта куплена! Сила клика увеличена.");
+            showBrawlAlert("⚒️ Шахта куплена!");
             saveGame();
         } else {
-            showBrawlAlert("❌ Недостаточно золота для покупки Шахты!");
+            showBrawlAlert("❌ Недостаточно золота!");
         }
     });
 }
@@ -233,7 +232,8 @@ function renderBrawlers() {
         const cost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
         const card = document.createElement('div');
         card.className = 'brawler-card';
-        
         card.innerHTML = `
             <div class="avatar-fallback">${b.icon}</div>
-            <h3 style="margin: 5px 0; color: #ffcc00;">${b.name}</h3>
+            <h3 style="margin:5px 0;color:#ffcc00;">${b.name}</h3>
+            <p style="margin:2px 0;font-size:14px;">Уровень: ${b.level}</p>
+            <p style="margin:2px 0;font-size:12px;color:#4ade80;">Клик: +${(b.level - 1) * b.bonus}</p>
