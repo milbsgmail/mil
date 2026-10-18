@@ -12,9 +12,7 @@ const allQs = [
 ];
 const counter = document.getElementById('gold-count'), clickPowerTxt = document.getElementById('click-power'), cpsDisplay = document.getElementById('cps-display'), upgradeBtn = document.getElementById('upgrade-btn'), clickActionBtn = document.getElementById('click-action-btn'), quizBtn = document.getElementById('quiz-btn'), brawlerBtn = document.getElementById('brawler-btn'), clickBtn = document.getElementById('click-btn'), topBtn = document.getElementById('top-btn'), quizSection = document.getElementById('quiz-section'), clickSection = document.getElementById('click-section'), brawlersSection = document.getElementById('brawlers-section'), topSection = document.getElementById('top-section'), brawlersList = document.getElementById('brawlers-list'), questionText = document.getElementById('questionText'), answersBlock = document.getElementById('answersBlock'), promoInput = document.getElementById('promo-input'), promoBtn = document.getElementById('promo-btn'), promoMsg = document.getElementById('promo-msg'), resetProgressBtn = document.getElementById('reset-progress-btn'), megaboxBtn = document.getElementById('megabox-btn'), ultTimer = document.getElementById('ult-timer'), alertContainer = document.getElementById('custom-alert-container');
 
-function saveGame() {
-    localStorage.setItem('brawlClubSave', JSON.stringify({ gold, gPerClick, upCost, usedPromos, brawlers: brawlers.map(b => ({ name: b.name, level: b.level })), onlinePlayers, lastBox }));
-}
+function saveGame() { localStorage.setItem('brawlClubSave', JSON.stringify({ gold, gPerClick, upCost, usedPromos, brawlers: brawlers.map(b => ({ name: b.name, level: b.level })), onlinePlayers, lastBox })); }
 function loadGame() {
     const saved = localStorage.getItem('brawlClubSave'); if (!saved) { updateUI(); return; }
     try {
