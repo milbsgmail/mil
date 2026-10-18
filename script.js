@@ -3,9 +3,10 @@ let gold = 0, gPerClick = 1, upCost = 15, curQIdx = 0, actQs = [], usedPromos = 
 let onlinePlayers = [{ name: "Magician_BS", gold: 95400 }, { name: "CyberLeon", gold: 82100 }, { name: "BrawlMaster", gold: 74500 }];
 
 const defBrawlers = [
-    { name: "Шелли", level: 1, baseCost: 10, bonus: 1, bonus_passive: 2, icon: "🤠" },
-    { name: "Кольт", level: 1, baseCost: 35, bonus: 2, bonus_passive: 5, icon: "🔫" },
-    { name: "Нита", level: 1, baseCost: 80, bonus: 4, bonus_passive: 12, icon: "🐻" }
+    { name: "Шелли", level: 1, baseCost: 10, bonus: 1, bonus_passive: 2, icon: "🤠", rarity: "rare" },
+    { name: "Кольт", level: 1, baseCost: 35, bonus: 2, bonus_passive: 5, icon: "🔫", rarity: "epic" },
+    { name: "Нита", level: 1, baseCost: 80, bonus: 4, bonus_passive: 12, icon: "🐻", rarity: "epic" },
+    { name: "Леон", level: 1, baseCost: 250, bonus: 10, bonus_passive: 35, icon: "🦎", rarity: "legendary" }
 ];
 let brawlers = JSON.parse(JSON.stringify(defBrawlers));
 
@@ -104,13 +105,12 @@ function updateUI() {
     if (upgradeBtn) upgradeBtn.textContent = `Купить Шахту (Цена: ${upCost} золота)`;
 }
 
-// Пассивный ежесекундный доход
+// Пассивный доход раз в секунду
 setInterval(() => {
     let income = getBPass();
     if (income > 0) {
         gold += income;
         if (counter) counter.textContent = Math.floor(gold);
-        // Не вызываем сохранение ежесекундно ради оптимизации, сохраняем при важных действиях
     }
 }, 1000);
 
@@ -130,7 +130,7 @@ function createFloatNum(e, v) {
     const c = document.querySelector('.click-area-container'); 
     if (!c) return; 
     const f = document.createElement('div');
-    f.className = isUltAct ? 'click-particle ult-float' : 'click-particle'; 
+    f.className = isUltAct ? 'floating-number ult-float' : 'floating-number'; 
     f.innerText = `+${v}`;
     const r = c.getBoundingClientRect(); 
     f.style.left = `${e.clientX - r.left}px`; 
@@ -139,7 +139,7 @@ function createFloatNum(e, v) {
     setTimeout(() => f.remove(), 700);
 }
 
-// Зарядка Супер-Клика раз в 60 секунд
+// Таймер готовности Супера
 setInterval(() => {
     if (!isUltAct && !isUltRdy && clickActionBtn) {
         isUltRdy = true; 
@@ -218,7 +218,6 @@ function renderBrawlers() {
         `;
         brawlersList.appendChild(card);
         
-        // Навешиваем обработчик клика СРАЗУ внутри цикла, пока доступен индекс 'i' и объект 'b'
         document.getElementById(`buy-brawler-${i}`).addEventListener('click', () => {
             const currentCost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
             if (gold >= currentCost) { 
@@ -229,8 +228,3 @@ function renderBrawlers() {
                 showBrawlAlert(`⭐ ${b.name} прокачан!`); 
                 saveGame(); 
             } else {
-                showBrawlAlert("❌ Недостаточно золота!");
-            }
-        });
-    }); // Здесь корректно закрывается brawlers.forEach
-} // Здесь корректно закрывается функция renderBrawlers
