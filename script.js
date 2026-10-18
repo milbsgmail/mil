@@ -94,7 +94,7 @@ clickActionBtn.addEventListener('click', (event) => {
     gold += currentClickPower;
     counter.textContent = Math.floor(gold);
     
-    // Вылетающие цифры в месте клика
+    // Создание анимации вылетающего золота в месте клика
     createFloatingNumber(event, currentClickPower);
     saveGame();
 });
@@ -173,11 +173,11 @@ promoBtn.addEventListener('click', () => {
         promoMsg.style.color = "#a855f7";
         promoMsg.textContent = "Режим Создателя! Получено +1,000,000 золота! 👑";
     } else if (code === "SHELLYUP") {
-        if(brawlers[0]) brawlers[0].level += 5;
+        if (brawlers[0]) brawlers[0].level += 5;
         promoMsg.style.color = "#3b82f6";
         promoMsg.textContent = "Шелли прокачалась сразу на +5 уровней! 🔥";
     } else if (code === "COLTUP") {
-        if(brawlers[1]) brawlers[1].level += 5;
+        if (brawlers[1]) brawlers[1].level += 5;
         promoMsg.style.color = "#ec4899";
         promoMsg.textContent = "Кольт прокачался сразу на +5 уровней! 🔫";
     } else if (code === "SHAKHTA") {
@@ -208,7 +208,11 @@ function renderBrawlers() {
         const card = document.createElement('div');
         card.className = "brawler-card";
         
+        // Порядковый номер файла картинки (images/1.png для Шелли и т.д.)
+        const imgNumber = i + 1;
+        
         card.innerHTML = `
+            <img src="images/${imgNumber}.png" alt="${b.name}" class="brawler-avatar">
             <h3 class="brawler-name">${b.name}</h3>
             <div class="brawler-level">Уровень: <b>${b.level}</b></div>
             <div class="brawler-stats">
@@ -254,15 +258,3 @@ function renderLeaderboard() {
         const row = document.createElement('tr');
         if (player.name === "Вы (Игрок)") {
             row.style.color = "#ffcc00";
-            row.style.fontWeight = "bold";
-        }
-        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${player.name}</td>
-            <td>${Math.floor(player.gold)}</td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-
-// 9. ВИКТОРИНА
