@@ -68,23 +68,6 @@ button:active {
     text-align: center;
 }
 
-/* Кнопки ответов в викторине */
-.quiz-answer-btn {
-    display: block;
-    width: 80%;
-    max-width: 400px;
-    margin: 10px auto;
-    background-color: #3b82f6;
-    color: #ffffff;
-    box-shadow: 0 4px 0 #1d4ed8;
-}
-.quiz-answer-btn:hover {
-    background-color: #60a5fa;
-}
-.quiz-answer-btn:active {
-    box-shadow: 0 2px 0 #1d4ed8;
-}
-
 /* Стилизация таблицы лидеров */
 table {
     background-color: #1f2937;
@@ -108,11 +91,51 @@ td {
     border-bottom: 1px solid #374151;
 }
 
-/* Желтая пунктирная подсветка строки игрока */
-.player-row {
-    outline: 3px dashed #ffcc00;
-    outline-offset: -3px;
-    background-color: #2d3748;
+/* ==========================================================================
+   НОВЫЕ ФИЧИ: ВЫЛЕТАЮЩИЕ ЦИФРЫ И СБРОС ПРОГРЕССА
+   ========================================================================== */
+
+/* Стиль для вылетающих цифр золота */
+.floating-number {
+    position: absolute;
+    pointer-events: none; /* Чтобы цифры не перехватывали клики мыши */
+    font-size: 26px;
+    font-weight: bold;
+    color: #ffcc00; /* Золотой цвет Brawl Stars */
+    /* Плотная черная обводка текста */
+    text-shadow: 
+        2px  2px 0px #000,
+       -2px -2px 0px #000,
+        2px -2px 0px #000,
+       -2px  2px 0px #000;
+    animation: floatUpAndFade 0.7s ease-out forwards;
+    z-index: 100;
+}
+
+/* Анимация: полет вверх и плавное растворение с легким увеличением */
+@keyframes floatUpAndFade {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -100px) scale(1.2);
+    }
+}
+
+/* Кнопка сброса прогресса (красная в стиле Brawl Stars) */
+.reset-btn {
+    background-color: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 4px 0 #991b1b;
+    border: 3px solid #ffffff;
+}
+.reset-btn:hover {
+    background-color: #ef4444;
+}
+.reset-btn:active {
+    box-shadow: 0 2px 0 #991b1b;
 }
 
 /* НАСТРОЙКИ ДЛЯ МОБИЛЬНЫХ ТЕЛЕФОНОВ */
