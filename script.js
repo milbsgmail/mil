@@ -129,14 +129,26 @@ if (clickActionBtn) {
 function createFloatNum(e, v) {
     const c = document.querySelector('.click-area-container'); 
     if (!c) return; 
+    
     const f = document.createElement('div');
     f.className = isUltAct ? 'floating-number ult-float' : 'floating-number'; 
     f.innerText = `+${v}`;
+    
+    // Считаем точные координаты клика относительно контейнера кнопки
     const r = c.getBoundingClientRect(); 
     f.style.left = `${e.clientX - r.left}px`; 
     f.style.top = `${e.clientY - r.top}px`; 
+    
+    // Случайный разлет: по горизонтали от -40px до +40px, по вертикали от -80px до -130px
+    const randomX = Math.floor(Math.random() * 81) - 40;
+    const randomY = Math.floor(Math.random() * 51) - 130;
+    
+    f.style.setProperty('--x-dir', `${randomX}px`);
+    f.style.setProperty('--y-dir', `${randomY}px`);
+    
     c.appendChild(f); 
-    setTimeout(() => f.remove(), 700);
+    
+    setTimeout(() => f.remove(), 600);
 }
 
 // Таймер готовности Супера
@@ -218,13 +230,3 @@ function renderBrawlers() {
         `;
         brawlersList.appendChild(card);
         
-        document.getElementById(`buy-brawler-${i}`).addEventListener('click', () => {
-            const currentCost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
-            if (gold >= currentCost) { 
-                gold -= currentCost; 
-                b.level += 1; 
-                updateUI(); 
-                renderBrawlers(); 
-                showBrawlAlert(`⭐ ${b.name} прокачан!`); 
-                saveGame(); 
-            } else {
