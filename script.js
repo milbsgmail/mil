@@ -36,7 +36,6 @@ let currentQuestionIndex = 0;
 let activeQuestions = [];
 let usedPromocodes = [];
 
-// Системные переменные для Ульты и Боксов
 let isUltReady = false;
 let isUltActive = false;
 let ultMultiplier = 1;
@@ -152,7 +151,7 @@ function createFloatingNumber(event, value) {
     }, 700);
 }
 
-// Таймер появления Ульты (Супер-клика)
+// Таймер появления Ульты
 setInterval(() => {
     if (!isUltActive && !isUltReady && clickActionBtn) {
         isUltReady = true;
@@ -265,3 +264,6 @@ if (promoBtn) {
             showBrawlAlert("Получено +5,000 золота!");
         } else if (code === "GOLD") {
             gold += 50000;
+            showBrawlAlert("Получено +50,000 золота!");
+        } else if (code === "DEV100") {
+            gold += 1000000;
