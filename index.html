@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бравл-Клаб</title>
-    <!-- Заглушка, чтобы гарантированно убрать ошибку favicon 404 в консоли браузера -->
-    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
@@ -31,7 +29,8 @@
             В секунду: +0 золота
         </div>
         
-        <div style="margin-top: 20px;">
+        <!-- Обернули кнопку в контейнер для корректных координат анимации вылетающих цифр -->
+        <div class="click-area-container" style="margin-top: 20px; display: inline-block; position: relative;">
             <button id="click-action-btn">Клик!</button>
         </div>
 
@@ -46,15 +45,17 @@
             <button id="promo-btn" style="padding: 10px 15px; font-size: 14px; margin-left: 5px;">Активировать</button>
             <p id="promo-msg" style="font-size: 13px; margin-top: 5px; font-weight: bold;"></p>
         </div>
+
+        <!-- Кнопка «Сбросить прогресс» для удобного тестирования -->
+        <div style="margin-top: 30px; border-top: 1px solid #4b5563; padding-top: 15px;">
+            <button id="reset-progress-btn" class="reset-btn">Сбросить прогресс</button>
+        </div>
     </div>
 
     <!-- Раздел Викторины -->
     <div id="quiz-section" style="margin-top: 30px; border-top: 1px solid #4b5563; padding-top: 20px; display: none;">
         <h2 id="questionText">Вопросы загружаются...</h2>
         <div id="answersBlock"></div>
-        <div style="margin-top: 20px;">
-            <button id="restart-quiz-btn">Начать викторину заново</button>
-        </div>
     </div>
 
     <!-- Раздел Бойцов -->
@@ -77,7 +78,7 @@
                     <th>Золото</th>
                 </tr>
             </thead>
-            <tbody id="leaderboard-body">
+            <tbody>
                 <!-- Таблица лидеров заполняется динамически через JS -->
             </tbody>
         </table>
