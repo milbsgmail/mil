@@ -50,12 +50,53 @@ button:active {
     box-shadow: 0 4px 0 #b33000;
     font-size: 24px;
     padding: 15px 40px;
+    transition: all 0.2s ease;
 }
 #click-action-btn:hover {
     background-color: #ff6347;
 }
 #click-action-btn:active {
     box-shadow: 0 2px 0 #b33000;
+}
+
+/* Эффект готовой или активной Ульты (Супер-клик) */
+#click-action-btn.ult-ready {
+    background-color: #a855f7 !important;
+    box-shadow: 0 4px 0 #6b21a8, 0 0 20px #a855f7 !important;
+    animation: pulseUlt 0.5s infinite alternate;
+}
+
+#click-action-btn.ult-active {
+    background-color: #e11d48 !important;
+    box-shadow: 0 4px 0 #9f1239, 0 0 25px #e11d48 !important;
+    transform: scale(1.1);
+}
+
+@keyframes pulseUlt {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.06); }
+}
+
+/* Полоска времени действия Ульты */
+.ult-timer-bar {
+    height: 6px;
+    background-color: #e11d48;
+    border-radius: 3px;
+    margin-top: 8px;
+    box-shadow: 0 0 8px #e11d48;
+    width: 100%;
+}
+
+/* Кнопка Мегабокса */
+.megabox-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: 3px solid #ffcc00;
+    box-shadow: 0 4px 0 #1e3a8a, 0 0 15px rgba(59, 130, 246, 0.6);
+    font-size: 18px;
+}
+.megabox-btn:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
 }
 
 /* Карточки бойцов */
@@ -78,7 +119,7 @@ button:active {
     object-fit: contain;
     margin-bottom: 10px;
     border-radius: 10px;
-    background-color: #374151; /* Подложка под иконку brawler */
+    background-color: #374151;
     padding: 6px;
     border: 2px solid #4b5563;
 }
@@ -122,6 +163,11 @@ td {
     z-index: 100;
 }
 
+.floating-number.ult-float {
+    color: #ff0055;
+    font-size: 34px;
+}
+
 @keyframes floatUpAndFade {
     0% {
         opacity: 1;
@@ -145,6 +191,37 @@ td {
 }
 .reset-btn:active {
     box-shadow: 0 2px 0 #991b1b;
+}
+
+/* Кастомные Уведомления (Brawl-Alerts) */
+.alert-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+}
+
+.brawl-alert {
+    background-color: #1f2937;
+    border: 4px solid #ffcc00;
+    border-radius: 16px;
+    color: white;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: slideDownAlert 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slideDownAlert {
+    0% { transform: translateY(-50px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
 }
 
 /* НАСТРОЙКИ ДЛЯ МОБИЛЬНЫХ ТЕЛЕФОНОВ */
