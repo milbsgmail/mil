@@ -1,6 +1,6 @@
-// === БЛОК СОХРАНЕНИЯ И ЗАГРУЗКИ (В САМОМ ВЕРХУ) ===
+// === БЛОК СОХРАНЕНИЯ И ЗАГРУЗКИ ===
 function saveGame() {
-    const dataToSave = {
+    localStorage.setItem('brawlClubSave', JSON.stringify({
         gold: gold,
         goldPerClick: goldPerClick,
         upgradeCost: upgradeCost,
@@ -8,8 +8,7 @@ function saveGame() {
         brawlers: brawlers.map(b => { return { name: b.name, level: b.level }; }),
         onlinePlayers: onlinePlayers,
         lastMegaboxTime: lastMegaboxTime
-    };
-    localStorage.setItem('brawlClubSave', JSON.stringify(dataToSave));
+    }));
 }
 
 function loadGame() {
@@ -29,7 +28,7 @@ function loadGame() {
                 if (internalBrawler) { internalBrawler.level = savedB.level; }
             });
         }
-    } catch (e) { console.error("Ошибка сохранения:", e); }
+    } catch (e) { console.error(e); }
     updateUI();
 }
 
@@ -39,26 +38,21 @@ const clickPowerTxt = document.getElementById('click-power');
 const cpsDisplay = document.getElementById('cps-display');
 const upgradeBtn = document.getElementById('upgrade-btn');
 const clickActionBtn = document.getElementById('click-action-btn');
-
 const quizBtn = document.getElementById('quiz-btn');
 const brawlerBtn = document.getElementById('brawler-btn');
 const clickBtn = document.getElementById('click-btn');
 const topBtn = document.getElementById('top-btn');
-
 const quizSection = document.getElementById('quiz-section');
 const clickSection = document.getElementById('click-section');
 const brawlersSection = document.getElementById('brawlers-section');
 const topSection = document.getElementById('top-section');
-
 const brawlersList = document.getElementById('brawlers-list');
 const questionText = document.getElementById('questionText');
 const answersBlock = document.getElementById('answersBlock');
-
 const promoInput = document.getElementById('promo-input');
 const promoBtn = document.getElementById('promo-btn');
 const promoMsg = document.getElementById('promo-msg');
 const resetProgressBtn = document.getElementById('reset-progress-btn');
-
 const megaboxBtn = document.getElementById('megabox-btn');
 const ultTimer = document.getElementById('ult-timer');
 const alertContainer = document.getElementById('custom-alert-container');
@@ -70,7 +64,6 @@ let upgradeCost = 15;
 let currentQuestionIndex = 0;
 let activeQuestions = [];
 let usedPromocodes = [];
-
 let isUltReady = false;
 let isUltActive = false;
 let ultMultiplier = 1;
@@ -94,8 +87,15 @@ const defaultBrawlers = [
     { name: "Мортис", level: 1, baseCost: 6000, bonus: 250, bonus_passive: 900, icon: "🦇" },
     { name: "Леон", level: 1, baseCost: 12500, bonus: 600, bonus_passive: 2500, icon: "🦎" }
 ];
-
 let brawlers = JSON.parse(JSON.stringify(defaultBrawlers));
+
+const allQuizQuestions = [
+    { question: "Кто начальный боец в Brawl Stars?", answers: ["Шелли", "Кольт", "Нита"], correct: 0 },
+    { question: "Какая редкость у Леона?", answers: ["Редкий", "Эпический", "Легендарный"], correct: 2 },
+    { question: "Какой боец бросает чемоданы?", answers: ["Мистер П.", "Гейл", "Лу"], correct: 0 },
+    { question: "Кто из них робот?", answers: ["Булл", "Рико", "Кольт"], correct: 1 },
+    { question: "Какое оружие у Кольта?", answers: ["Револьверы", "Дробовик", "Лук"], correct: 0 }
+];
 
 // КАСТОМНЫЕ УВЕДОМЛЕНИЯ
 function showBrawlAlert(message) {
@@ -117,7 +117,6 @@ function switchTab(showSec) {
     [quizSection, clickSection, brawlersSection, topSection].forEach(s => { if(s) s.style.display = 'none'; });
     if(showSec) showSec.style.display = 'block';
 }
-
 clickBtn.addEventListener('click', () => { switchTab(clickSection); });
 brawlerBtn.addEventListener('click', () => { switchTab(brawlersSection); renderBrawlers(); });
 quizBtn.addEventListener('click', () => { switchTab(quizSection); initQuiz(); });
@@ -127,7 +126,6 @@ topBtn.addEventListener('click', () => { switchTab(topSection); renderLeaderboar
 function getBonusPower() {
     return brawlers.reduce((sum, b) => { return sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0); }, 0);
 }
-
 function getPassiveIncome() {
     return brawlers.reduce((sum, b) => { return sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0); }, 0);
 }
@@ -165,12 +163,11 @@ function createFloatingNumber(event, value) {
     setTimeout(() => { floatEl.remove(); }, 700);
 }
 
-// Таймер появления Ульты
 setInterval(() => {
     if (!isUltActive && !isUltReady && clickActionBtn) {
         isUltReady = true;
         clickActionBtn.classList.add('ult-ready');
-        showBrawlAlert("⚡ СУПЕР-КЛИК ГОТОВ! Нажми на кнопку клика!");
+        showBrawlAlert("⚡ СУПЕР-КЛИК ГОТОВ!");
         setTimeout(() => {
             if (isUltReady && !isUltActive && clickActionBtn) {
                 isUltReady = false;
@@ -182,72 +179,47 @@ setInterval(() => {
 
 function activateUlt() {
     if (!clickActionBtn || !ultTimer) return;
-    isUltReady = false;
-    isUltActive = true;
-    let oldMultiplier = ultMultiplier;
-    ultMultiplier = 5;
+    isUltReady = false; isUltActive = true;
+    let oldMultiplier = ultMultiplier; ultMultiplier = 5;
     clickActionBtn.classList.remove('ult-ready');
     clickActionBtn.classList.add('ult-active');
-    ultTimer.style.display = 'block';
-    ultTimer.style.width = '100%';
-    showBrawlAlert("🔥 АКТИВИРОВАНА УЛЬТА! Клик Х5!");
-    updateUI();
+    ultTimer.style.display = 'block'; ultTimer.style.width = '100%';
+    showBrawlAlert("🔥 УЛЬТА АКТИВИРОВАНА (Х5)!"); updateUI();
     let timeLeft = 100;
     const animInterval = setInterval(() => {
-        timeLeft -= 2;
-        ultTimer.style.width = `${timeLeft}%`;
+        timeLeft -= 2; ultTimer.style.width = `${timeLeft}%`;
         if (timeLeft <= 0) {
-            clearInterval(animInterval);
-            isUltActive = false;
-            ultMultiplier = oldMultiplier;
-            clickActionBtn.classList.remove('ult-active');
-            ultTimer.style.display = 'none';
-            showBrawlAlert("Эффект ульты закончился.");
-            updateUI();
-            saveGame();
+            clearInterval(animInterval); isUltActive = false; ultMultiplier = oldMultiplier;
+            clickActionBtn.classList.remove('ult-active'); ultTimer.style.display = 'none';
+            showBrawlAlert("Ульта закончилась."); updateUI(); saveGame();
         }
     }, 100);
 }
 
-// Открытие Мегабокса
 megaboxBtn.addEventListener('click', () => {
     const now = Date.now();
     if (now - lastMegaboxTime < 60000) {
-        const remains = Math.ceil((60000 - (now - lastMegaboxTime)) / 1000);
-        showBrawlAlert(`Box заблокирован! Подожди еще ${remains} сек.`);
-        return;
+        showBrawlAlert(`Подожди еще ${Math.ceil((60000 - (now - lastMegaboxTime)) / 1000)} сек.`); return;
     }
     const prize = Math.floor(Math.random() * 4501) + 500;
-    gold += prize;
-    lastMegaboxTime = now;
-    showBrawlAlert(`📦 Из Мегабокса выпало: +${prize} золота! ⭐`);
-    updateUI();
-    saveGame();
+    gold += prize; lastMegaboxTime = now;
+    showBrawlAlert(`📦 Из Мегабокса выпало: +${prize} золота!`); updateUI(); saveGame();
 });
 
 upgradeBtn.addEventListener('click', () => {
     if (gold >= upgradeCost) {
-        gold -= upgradeCost;
-        goldPerClick += 1;
-        upgradeCost = Math.round(upgradeCost * 1.5);
-        updateUI();
-        saveGame();
-    } else {
-        const originalText = upgradeBtn.textContent;
-        upgradeBtn.textContent = "Недостаточно золота!";
-        setTimeout(() => { upgradeBtn.textContent = originalText; }, 1000);
-    }
+        gold -= upgradeCost; goldPerClick += 1; upgradeCost = Math.round(upgradeCost * 1.5);
+        updateUI(); saveGame();
+    } else { showBrawlAlert("Недостаточно золота!"); }
 });
 
 resetProgressBtn.addEventListener('click', () => {
-    const confirmReset = confirm("Вы уверены, что хотите обнулить весь игровой прогресс?");
-    if (confirmReset) {
-        localStorage.removeItem('brawlClubSave');
-        window.location.reload();
-    }
+    if (confirm("Сбросить прогресс?")) { localStorage.removeItem('brawlClubSave'); window.location.reload(); }
 });
 
 // 7. СИСТЕМА ПРОМОКОДОВ
 promoBtn.addEventListener('click', () => {
     const code = promoInput.value.trim().toUpperCase();
-    if (code === "") { promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Введите code!"; return; }
+    if (code === "") { return; }
+    if (usedPromocodes.includes(code)) { showBrawlAlert("Уже активирован!"); return; }
+    let success = false;
