@@ -1,3 +1,4 @@
+
 // 1. ЭЛЕМЕНТЫ СТРАНИЦЫ
 const counter = document.getElementById('gold-count');
 const clickPowerTxt = document.getElementById('click-power');
@@ -101,7 +102,6 @@ function getBonusPower() {
     return brawlers.reduce((sum, b) => { return sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0); }, 0);
 }
 
-// Пассивный доход идет только после прокачки уровня выше 1-го уровня
 function getPassiveIncome() {
     return brawlers.reduce((sum, b) => { return sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0); }, 0);
 }
@@ -242,7 +242,9 @@ promoBtn.addEventListener('click', () => {
     else if (code === "DEV100") { gold += 1000000; success = true; }
     else if (code === "SHAKHTA") { goldPerClick += 20; success = true; }
     else if (code === "FREECOINS") { gold += 1500; success = true; }
-    else if (code === "SHELLYUP") { if(brawlers && brawlers[0]) { brawlers[0].level += 5; success = true; renderBrawlers(); } }
-    else if (code === "COLTUP") { if(brawlers && brawlers[1]) { brawlers[1].level += 5; success = true; renderBrawlers(); } }
+    else if (code === "SHELLYUP") { if(brawlers[0]) { brawlers[0].level += 5; success = true; renderBrawlers(); } }
+    else if (code === "COLTUP") { if(brawlers[1]) { brawlers[1].level += 5; success = true; renderBrawlers(); } }
     
     if (success) {
+        showBrawlAlert(`Активирован промокод: ${code}!`);
+
