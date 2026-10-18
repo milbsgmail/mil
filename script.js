@@ -89,10 +89,6 @@ function switchTab(s) {
     [quizSection, clickSection, brawlersSection, topSection].forEach(x => { if(x) x.style.display = 'none'; }); 
     if(s) s.style.display = 'block'; 
 }
-if(clickBtn) clickBtn.addEventListener('click', () => switchTab(clickSection));
-if(brawlerBtn) brawlerBtn.addEventListener('click', () => { switchTab(brawlersSection); renderBrawlers(); });
-if(quizBtn) quizBtn.addEventListener('click', () => { switchTab(quizSection); initQuiz(); });
-if(topBtn) topBtn.addEventListener('click', () => { switchTab(topSection); renderLeaderboard(); });
 
 // --- 6. Экономические Расчеты и Интерфейс ---
 function getBClick() { return brawlers.reduce((s, b) => s + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0); }
@@ -131,23 +127,18 @@ function createFloatNum(e, v) {
     f.className = isUltAct ? 'floating-number ult-float' : 'floating-number'; 
     f.innerText = `+${v}`;
     
-    // Получаем абсолютные координаты клика по странице (независимо от скролла)
-    const pageX = e.pageX;
-    const pageY = e.pageY;
-    
-    f.style.left = `${pageX}px`; 
-    f.style.top = `${pageY}px`; 
+    // Абсолютные глобальные координаты клика по странице (фикс бага)
+    f.style.left = `${e.pageX}px`; 
+    f.style.top = `${e.pageY}px`; 
     
     // Случайный угол разлета
-    const randomX = Math.floor(Math.random() * 101) - 50;  // влево/вправо от -50 до 50
-    const randomY = Math.floor(Math.random() * 61) - 140;  // вверх от -140 до -80
+    const randomX = Math.floor(Math.random() * 101) - 50; 
+    const randomY = Math.floor(Math.random() * 61) - 140; 
     
     f.style.setProperty('--x-dir', `${randomX}px`);
     f.style.setProperty('--y-dir', `${randomY}px`);
     
-    // Добавляем напрямую в body, чтобы избежать конфликтов с флексбоксами кнопок!
     document.body.appendChild(f); 
-    
     setTimeout(() => f.remove(), 600);
 }
 
@@ -230,3 +221,21 @@ function renderBrawlers() {
         `;
         brawlersList.appendChild(card);
         
+        document.getElementById(`buy-brawler-${i}`).addEventListener('click', () => {
+            const currentCost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
+            if (gold >= currentCost) { 
+                gold -= currentCost; 
+                b.level += 1; 
+                updateUI(); 
+                renderBrawlers(); 
+                showBrawlAlert(`⭐ ${b.name} прокачан!`); 
+                saveGame(); 
+            } else {
+                showBrawlAlert("❌ Недостаточно золота!");
+            }
+        });
+    });
+}
+
+// --- 9. Викторина ---
+function initQuiz() { 
