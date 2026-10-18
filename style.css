@@ -7,6 +7,8 @@ body {
     padding: 20px;
     margin: 0;
     touch-action: manipulation; /* Отключает приближение при двойном клике на телефоне */
+    position: relative; /* Критически важно для правильного вылета цифр по всей странице! */
+    min-height: 100vh;
 }
 
 /* Стилизация заголовка */
@@ -235,43 +237,45 @@ td {
     border-bottom: 1px solid #374151;
 }
 
-/* Контейнер клика с relative-позиционированием */
+/* Контейнер клика */
 .click-area-container {
     position: relative;
     display: inline-block;
 }
 
-/* Вылетающие цифры золота (+Х) с поддержкой JS-векторов разлета */
+/* Абсолютно позиционируемые вылетающие цифры золота (+Х) */
 .floating-number {
     position: absolute;
     pointer-events: none;
-    font-size: 28px;
+    font-size: 32px;
     font-family: 'Impact', 'Arial Black', sans-serif;
     font-weight: bold;
     color: #ffcc00;
     text-shadow: 
-        2px  2px 0px #000,
-       -2px -2px 0px #000,
-        2px -2px 0px #000,
-       -2px  2px 0px #000;
-    z-index: 100;
-    transform: translate(-50%, -50%);
+        2.5px  2.5px 0px #000,
+       -2.5px -2.5px 0px #000,
+        2.5px -2.5px 0px #000,
+       -2.5px  2.5px 0px #000;
+    z-index: 9999;
+    /* Убираем конфликты с внешними стилями через transform-origin */
+    transform-origin: center;
     animation: floatUpAndFade 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
 }
 
 .floating-number.ult-float {
     color: #ff0055;
-    font-size: 36px;
+    font-size: 42px;
 }
 
 @keyframes floatUpAndFade {
     0% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(0.3);
+        transform: translate(-50%, -50%) scale(0.4);
     }
     100% {
         opacity: 0;
-        transform: translate(calc(-50% + var(--x-dir)), calc(-50% + var(--y-dir))) scale(1.2);
+        /* Перемещаем цифру на случайные расстояния var(--x-dir) и var(--y-dir) */
+        transform: translate(calc(-50% + var(--x-dir)), calc(-50% + var(--y-dir))) scale(1.3);
     }
 }
 
