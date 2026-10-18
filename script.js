@@ -1,4 +1,4 @@
-// --- 1. Состояние игры ---
+// --- 1. Базовые данные ---
 let gold = 0, gPerClick = 1, upCost = 15, curQIdx = 0, actQs = [], usedPromos = [], isUltRdy = false, isUltAct = false, ultMult = 1, lastBox = 0;
 let onlinePlayers = [{ name: "Magician_BS", gold: 95400 }, { name: "CyberLeon", gold: 82100 }, { name: "BrawlMaster", gold: 74500 }];
 
@@ -12,13 +12,10 @@ let brawlers = JSON.parse(JSON.stringify(defBrawlers));
 
 const allQs = [
     { question: "Кто начальный боец в Brawl Stars?", answers: ["Шелли", "Кольт", "Нита"], correct: 0 },
-    { question: "Какая rarity у Леона?", answers: ["Редкий", "Эпический", "Легендарный"], correct: 2 },
-    { question: "Какая валюта используется для покупки Шахты?", answers: ["Кристаллы", "Золото", "Стар Поинты"], correct: 1 },
-    { question: "Какое животное вызывает Нита своим Супером?", answers: ["Медведь", "Собака", "Хамелеон"], correct: 0 },
-    { question: "Какое максимальное количество вопросов в викторине?", answers: ["3", "10", "5"], correct: 2 }
+    { question: "Какая редкость у Леона?", answers: ["Редкий", "Эпический", "Легендарный"], correct: 2 }
 ];
 
-// --- 2. Получение DOM-элементов ---
+// --- 2. Получение элементов ---
 const $ = id => document.getElementById(id);
 const el = {
     gold: $('gold-count'), power: $('click-power'), cps: $('cps-display'), upgrade: $('upgrade-btn'),
@@ -29,7 +26,7 @@ const el = {
     box: $('megabox-btn'), ultBar: $('ult-timer'), alert: $('custom-alert-container')
 };
 
-// --- 3. Базовые функции ---
+// --- 3. Системные функции ---
 function saveGame() { localStorage.setItem('brawlClubSave', JSON.stringify({ gold, gPerClick, upCost, usedPromos, brawlers: brawlers.map(b => ({ name: b.name, level: b.level })), onlinePlayers, lastBox })); }
 function getBClick() { return brawlers.reduce((s, b) => s + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0); }
 function getBPass() { return brawlers.reduce((s, b) => s + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0), 0); }
@@ -48,7 +45,7 @@ function showBrawlAlert(m) {
 
 function switchTab(s) { [el.quizSec, el.clickSec, el.brawlerSec, el.topSec].forEach(x => { if(x) x.style.display = 'none'; }); if(s) s.style.display = 'block'; }
 
-// --- 4. Механика клика и вылетающих цифр ---
+// --- 4. Клик и Разлет Цифр ---
 if (el.click) {
     el.click.addEventListener('click', (e) => {
         if (isUltRdy && !isUltAct) activateUlt();
@@ -66,7 +63,7 @@ function createFloatNum(e, v) {
     document.body.appendChild(f); setTimeout(() => f.remove(), 600);
 }
 
-// --- 5. Шахта и Прокачка бойцов ---
+// --- 5. Магазин Бойцов и Шахта ---
 if (el.upgrade) {
     el.upgrade.addEventListener('click', () => {
         if (gold >= upCost) { gold -= upCost; gPerClick += 1; upCost = Math.round(upCost * 1.5); updateUI(); showBrawlAlert("⚒️ Шахта куплена!"); saveGame(); }
@@ -79,7 +76,7 @@ function renderBrawlers() {
     brawlers.forEach((b, i) => {
         const cost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
         const card = document.createElement('div'); card.className = `brawler-card brawler-${b.rarity || 'rare'}`;
-        card.innerHTML = `<div class="avatar-fallback">${b.icon}</div><h3 style="margin:5px 0;color:#ffcc00;text-shadow:1px 1px 0 #000;">${b.name}</h3><p style="margin:2px 0;font-size:14px;font-weight:bold;">Уровень: ${b.level}</p><p style="margin:2px 0;font-size:12px;color:#4ade80;font-weight:bold;">Клик: +${(b.level - 1) * b.bonus}</p><p style="margin:2px 0;font-size:12px;color:#60a5fa;font-weight:bold;">Пассив: +${(b.level - 1) * b.bonus_passive}/с</p><button id="buy-brawler-${i}" style="padding:6px 12px;font-size:13px;width:100%;margin-top:10px;">Прокачать (${cost} З.)</button>`;
+        card.innerHTML = `<div class="avatar-fallback">${b.icon}</div><h3 style="margin:5px 0;color:#ffcc00;">${b.name}</h3><p style="margin:2px 0;font-size:14px;font-weight:bold;">Уровень: ${b.level}</p><p style="margin:2px 0;font-size:12px;color:#4ade80;">Клик: +${(b.level - 1) * b.bonus}</p><p style="margin:2px 0;font-size:12px;color:#60a5fa;">Пассив: +${(b.level - 1) * b.bonus_passive}/с</p><button id="buy-brawler-${i}" style="padding:6px 12px;font-size:13px;width:100%;margin-top:10px;">Прокачать (${cost} З.)</button>`;
         el.list.appendChild(card);
         document.getElementById(`buy-brawler-${i}`).addEventListener('click', () => {
             const currentCost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
@@ -93,10 +90,10 @@ function renderBrawlers() {
 function initQuiz() { actQs = [...allQs].sort(() => 0.5 - Math.random()).slice(0, 5); curQIdx = 0; showQuestion(); }
 function showQuestion() {
     if (!el.qText || !el.ansBlock) return; el.ansBlock.innerHTML = '';
-    if (curQIdx >= actQs.length) { const b = 150; gold += b; el.qText.innerText = "🎉 Викторина пройдена!"; el.ansBlock.innerHTML = `<p style="color:#4ade80;font-weight:bold;">Бонус +${b} золота!</p>`; updateUI(); saveGame(); return; }
+    if (curQIdx >= actQs.length) { gold += 150; el.qText.innerText = "🎉 Викторина пройдена!"; el.ansBlock.innerHTML = `<p style="color:#4ade80;font-weight:bold;">Бонус +150 золота!</p>`; updateUI(); saveGame(); return; }
     const q = actQs[curQIdx]; el.qText.innerText = `Вопрос ${curQIdx + 1}/${actQs.length}: ${q.question}`;
     q.answers.forEach((ans, idx) => {
-        const btn = document.createElement('button'); btn.innerText = ans; btn.className = 'quiz-answer-btn'; btn.style = 'display:block;width:100%;max-width:300px;margin:8px auto;padding:10px;font-weight:bold;cursor:pointer;';
+        const btn = document.createElement('button'); btn.innerText = ans; btn.style = 'display:block;width:100%;max-width:300px;margin:8px auto;padding:10px;font-weight:bold;cursor:pointer;';
         btn.addEventListener('click', () => {
             if (idx === q.correct) { gold += 30; showBrawlAlert("✅ Правильно! +30 Золота"); } else showBrawlAlert("❌ Неверно!");
             curQIdx++; updateUI(); showQuestion();
@@ -123,7 +120,7 @@ function activateUlt() {
     });
 }
 
-// --- 8. Мегабокс, Топ, Промокоды, Сброс ---
+// --- 8. Бонусы, Топ, Промокоды и Навигация ---
 if (el.box) {
     el.box.addEventListener('click', () => {
         const now = Date.now(), cd = 24 * 60 * 60 * 1000;
@@ -151,3 +148,11 @@ if (el.pBtn && el.pInput && el.pMsg) {
     });
 }
 
+if (el.reset) {
+    el.reset.addEventListener('click', () => {
+        if (confirm("Обнулить игру?") && confirm("Точно обнулить прогресс?")) { localStorage.removeItem('brawlClubSave'); location.reload(); }
+    });
+}
+
+if(el.clickBtn) el.clickBtn.addEventListener('click', () => switchTab(el.clickSec));
+if(el.brawlerBtn) el.brawlerBtn.addEventListener('click', () => { switchTab(el.brawlerSec); renderBrawlers(); });
