@@ -61,7 +61,7 @@ const allQuizQuestions = [
     { question: "Какое оружие у Кольта?", answers: ["Револьверы", "Дробовик", "Лук"], correct: 0 }
 ];
 
-// 3. ПЕРЕКЛЮЧЕНИЕ МЕНЮ (НАВИГАНИЯ)
+// 3. ПЕРЕКЛЮЧЕНИЕ МЕНЮ (НАВИГАЦИЯ)
 function switchTab(showSec) {
     [quizSection, clickSection, brawlersSection, topSection].forEach(s => s.style.display = 'none');
     showSec.style.display = 'block';
@@ -71,7 +71,6 @@ clickBtn.addEventListener('click', () => switchTab(clickSection));
 brawlerBtn.addEventListener('click', () => { switchTab(brawlersSection); renderBrawlers(); });
 quizBtn.addEventListener('click', () => { switchTab(quizSection); initQuiz(); });
 topBtn.addEventListener('click', () => { switchTab(topSection); renderLeaderboard(); });
-
 // 4. МЕХАНИКА РАСЧЕТОВ КЛИКА И ПАССИВА
 function getBonusPower() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0);
@@ -144,7 +143,6 @@ if (resetProgressBtn) {
         }
     });
 }
-
 // 7. СИСТЕМА ПРОМОКОДОВ
 promoBtn.addEventListener('click', () => {
     const code = promoInput.value.trim().toUpperCase();
@@ -241,7 +239,6 @@ function renderBrawlers() {
         });
     });
 }
-
 // 9. ДИНАМИЧЕСКАЯ ТАБЛИЦА ЛИДЕРОВ
 function renderLeaderboard() {
     const tableBody = document.querySelector('table tbody');
@@ -261,3 +258,88 @@ function renderLeaderboard() {
         row.innerHTML = `
             <td>${index + 1}</td>
             <td>${player.name}</td>
+            <td>${Math.floor(player.gold)}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+// 10. ВИКТОРИНА
+function initQuiz() {
+    currentQuestionIndex = 0;
+    activeQuestions = [...allQuizQuestions].sort(() => 0.5 - Math.random());
+    showQuestion();
+}
+
+function showQuestion() {
+    answersBlock.innerHTML = "";
+    if (currentQuestionIndex >= activeQuestions.length) {
+        questionText.textContent = "Викторина пройдена! Возвращайтесь позже за новыми наградами.";
+        return;
+    }
+    
+    const q = activeQuestions[currentQuestionIndex];
+    questionText.textContent = q.question;
+    
+    q.answers.forEach((ans, idx) => {
+        const btn = document.createElement('button');
+        btn.textContent = ans;
+        btn.addEventListener('click', () => {
+            if (idx === q.correct) {
+                gold += 150;
+                updateUI();
+                alert("Правильно! Получено +150 золота.");
+            } else {
+                alert("Неправильно! Попробуй в следующий раз.");
+            }
+            currentQuestionIndex++;
+            showQuestion();
+            saveGame();
+        });
+        answersBlock.appendChild(btn);
+    });
+}
+
+// 11. ПАССИВНЫЙ ДОХОД ПО ТАЙМЕРУ
+setInterval(() => {
+    gold += getPassiveIncome();
+    counter.textContent = Math.floor(gold);
+}, 1000);
+
+// 12. СОХРАНЕНИЕ И ЗАГРУЗКА ИГРЫ
+function saveGame() {
+    const gameState = {
+        gold: gold,
+        goldPerClick: goldPerClick,
+        upgradeCost: upgradeCost,
+        usedPromocodes: usedPromocodes,
+        brawlers: brawlers
+    };
+    localStorage.setItem('brawlClubSave', JSON.stringify(gameState));
+}
+
+function loadGame() {
+    const savedData = localStorage.getItem('brawlClubSave');
+    if (savedData) {
+        try {
+            const gameState = JSON.parse(savedData);
+            gold = gameState.gold || 0;
+            goldPerClick = gameState.goldPerClick || 1;
+            upgradeCost = gameState.upgradeCost || 15;
+            usedPromocodes = gameState.usedPromocodes || [];
+            
+            if (gameState.brawlers) {
+                gameState.brawlers.forEach((savedBrawler, index) => {
+                    if (brawlers[index]) {
+                        brawlers[index].level = savedBrawler.level;
+                    }
+                });
+            }
+        } catch (e) {
+            console.error("Ошибка загрузки сохранения: ", e);
+        }
+    }
+    updateUI();
+}
+
+loadGame();
