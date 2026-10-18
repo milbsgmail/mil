@@ -71,7 +71,7 @@ const allQuizQuestions = [
     { question: "Какое оружие у Кольта?", answers: ["Револьверы", "Дробовик", "Лук"], correct: 0 }
 ];
 
-// КАСТOМНЫЕ УВЕДОМЛЕНИЯ
+// КАСТОМНЫЕ УВЕДОМЛЕНИЯ
 function showBrawlAlert(message) {
     const alertBox = document.createElement('div');
     alertBox.className = 'brawl-alert';
@@ -170,6 +170,7 @@ setInterval(() => {
 function activateUlt() {
     isUltReady = false;
     isUltActive = true;
+    let oldMultiplier = ultMultiplier;
     ultMultiplier = 5; // Множитель клика х5
     clickActionBtn.classList.remove('ult-ready');
     clickActionBtn.classList.add('ult-active');
@@ -186,7 +187,7 @@ function activateUlt() {
         if (timeLeft <= 0) {
             clearInterval(animInterval);
             isUltActive = false;
-            ultMultiplier = 1;
+            ultMultiplier = oldMultiplier;
             clickActionBtn.classList.remove('ult-active');
             ultTimer.style.display = 'none';
             showBrawlAlert("Эффект ульты закончился.");
@@ -200,7 +201,7 @@ function activateUlt() {
 if (megaboxBtn) {
     megaboxBtn.addEventListener('click', () => {
         const now = Date.now();
-        // Раз в минуту для тестов (вместо суток 86400000)
+        // Раз в минуту для тестов
         if (now - lastMegaboxTime < 60000) {
             const remains = Math.ceil((60000 - (now - lastMegaboxTime)) / 1000);
             showBrawlAlert(`Box заблокирован! Подожди еще ${remains} сек.`);
@@ -260,7 +261,7 @@ promoBtn.addEventListener('click', () => {
         showBrawlAlert("Получено +5,000 золота!");
     } else if (code === "GOLD") {
         gold += 50000;
-        showBrawlAlert("Получено +50,000 золота!");
+        showBrawlAlert("Получено +5,0000 золота!");
     } else if (code === "DEV100") {
         gold += 1000000;
         showBrawlAlert("Режим Создателя! +1,000,000 золота! 👑");
