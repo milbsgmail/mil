@@ -264,7 +264,18 @@ function renderLeaderboard() {
     });
 }
 
-// 10. ВИКТОРИНА
+// 10. ВИКТОРИНА — ИНИЦИАЛИЗАЦИЯ
+function initQuiz() {
+    currentQuestionIndex = 0;
+    activeQuestions = [...allQuizQuestions].sort(() => 0.5 - Math.random());
+    
+    const oldMsg = document.getElementById('quiz-status-msg');
+    if (oldMsg) oldMsg.remove();
+    
+    showQuestion();
+}
+
+// 11. ПОКАЗ ВОПРОСОВ (БЕЗ ОКНА ALERT)
 function showQuestion() {
     answersBlock.innerHTML = "";
     if (currentQuestionIndex >= activeQuestions.length) {
@@ -275,15 +286,14 @@ function showQuestion() {
     const q = activeQuestions[currentQuestionIndex];
     questionText.textContent = q.question;
     
-    // Создаем элемент для красивого текста ответа, если его ещё нет
     let statusMsg = document.getElementById('quiz-status-msg');
     if (!statusMsg) {
         statusMsg = document.createElement('p');
         statusMsg.id = 'quiz-status-msg';
-        statusMsg.style.fontSize = '16px';
+        statusMsg.style.fontSize = '18px';
         statusMsg.style.fontWeight = 'bold';
         statusMsg.style.marginTop = '15px';
-        // Вставляем сразу после блока вопросов
+        statusMsg.style.minHeight = '24px';
         answersBlock.parentNode.appendChild(statusMsg);
     }
     
@@ -294,37 +304,32 @@ function showQuestion() {
             if (idx === q.correct) {
                 gold += 150;
                 updateUI();
-                
-                // Выводим зеленый текст прямо на страницу вместо alert
                 statusMsg.style.color = "#4ade80";
                 statusMsg.textContent = "Правильно! Получено +150 золота. 🎉";
             } else {
-                // Выводим красный текст прямо на страницу вместо alert
                 statusMsg.style.color = "#ef4444";
                 statusMsg.textContent = "Неправильно! Попробуй в следующий раз. ❌";
             }
             
-            // Стираем надпись через 2 секунды
+            // Ждем 1.5 секунды, очищаем текст и идем к следующему вопросу
             setTimeout(() => {
                 statusMsg.textContent = "";
-            }, 2000);
-
-            currentQuestionIndex++;
-            showQuestion();
-            saveGame();
+                currentQuestionIndex++;
+                showQuestion();
+                saveGame();
+            }, 1500);
         });
         answersBlock.appendChild(btn);
     });
 }
 
-// 11. ПАССИВНЫЙ ДОХОД ПО ТАЙМЕР;
-            saveGame();У
+// 12. ПАССИВНЫЙ ДОХОД ПО ТАЙМЕРУ
 setInterval(() => {
     gold += getPassiveIncome();
     counter.textContent = Math.floor(gold);
 }, 1000);
 
-// 12. СОХРАНЕНИЕ И ЗАГРУЗКА ИГРЫ
+// 13. СОХРАНЕНИЕ И ЗАГРУЗКА ИГРЫ
 function saveGame() {
     const gameState = {
         gold: gold,
