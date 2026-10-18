@@ -179,47 +179,61 @@ setInterval(() => {
 
 function activateUlt() {
     if (!clickActionBtn || !ultTimer) return;
-    isUltReady = false; isUltActive = true;
-    let oldMultiplier = ultMultiplier; ultMultiplier = 5;
+    isUltReady = false; 
+    isUltActive = true;
+    ultMultiplier = 5;
     clickActionBtn.classList.remove('ult-ready');
     clickActionBtn.classList.add('ult-active');
-    ultTimer.style.display = 'block'; ultTimer.style.width = '100%';
-    showBrawlAlert("🔥 УЛЬТА АКТИВИРОВАНА (Х5)!"); updateUI();
-    let timeLeft = 100;
-    const animInterval = setInterval(() => {
-        timeLeft -= 2; ultTimer.style.width = `${timeLeft}%`;
-        if (timeLeft <= 0) {
-            clearInterval(animInterval); isUltActive = false; ultMultiplier = oldMultiplier;
-            clickActionBtn.classList.remove('ult-active'); ultTimer.style.display = 'none';
-            showBrawlAlert("Ульта закончилась."); updateUI(); saveGame();
+    ultTimer.style.display = 'block';
+    ultTimer.style.width = '100%';
+    updateUI();
+
+    let duration = 5000;
+    let start = null;
+    function step(timestamp) {
+        if (!start) start = timestamp;
+        let progress = timestamp - start;
+        let percentage = Math.max(0, 100 - (progress / duration) * 100);
+        ultTimer.style.width = `${percentage}%`;
+        if (progress < duration) {
+            requestAnimationFrame(step);
+        } else {
+            isUltActive = false;
+            ultMultiplier = 1;
+            clickActionBtn.classList.remove('ult-active');
+            ultTimer.style.display = 'none';
+            updateUI();
+            saveGame();
         }
-    }, 100);
+    }
+    requestAnimationFrame(step);
 }
 
-megaboxBtn.addEventListener('click', () => {
-    const now = Date.now();
-    if (now - lastMegaboxTime < 60000) {
-        showBrawlAlert(`Подожди еще ${Math.ceil((60000 - (now - lastMegaboxTime)) / 1000)} сек.`); return;
-    }
-    const prize = Math.floor(Math.random() * 4501) + 500;
-    gold += prize; lastMegaboxTime = now;
-    showBrawlAlert(`📦 Из Мегабокса выпало: +${prize} золота!`); updateUI(); saveGame();
-});
+// Покупка апгрейда «Шахта»
+if (upgradeBtn) {
+    upgradeBtn.addEventListener('click', () => {
+        if (gold >= upgradeCost) {
+            gold -= upgradeCost;
+            goldPerClick += 1;
+            upgradeCost = Math.round(upgradeCost * 1.5);
+            updateUI();
+            showBrawlAlert("⚒️ Шахта куплена! Сила клика увеличена.");
+            saveGame();
+        } else {
+            showBrawlAlert("❌ Недостаточно золота для покупки Шахты!");
+        }
+    });
+}
 
-upgradeBtn.addEventListener('click', () => {
-    if (gold >= upgradeCost) {
-        gold -= upgradeCost; goldPerClick += 1; upgradeCost = Math.round(upgradeCost * 1.5);
-        updateUI(); saveGame();
-    } else { showBrawlAlert("Недостаточно золота!"); }
-});
-
-resetProgressBtn.addEventListener('click', () => {
-    if (confirm("Сбросить прогресс?")) { localStorage.removeItem('brawlClubSave'); window.location.reload(); }
-});
-
-// 7. СИСТЕМА ПРОМОКОДОВ
-promoBtn.addEventListener('click', () => {
-    const code = promoInput.value.trim().toUpperCase();
-    if (code === "") { return; }
-    if (usedPromocodes.includes(code)) { showBrawlAlert("Уже активирован!"); return; }
-    let success = false;
+// 7. МЕХАНИКА БОЙЦОВ
+function renderBrawlers() {
+    if (!brawlersList) return;
+    brawlersList.innerHTML = '';
+    brawlers.forEach((b, index) => {
+        const cost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
+        const card = document.createElement('div');
+        card.className = 'brawler-card';
+        
+        card.innerHTML = `
+            <div class="avatar-fallback">${b.icon}</div>
+            <h3 style="margin: 5px 0; color: #ffcc00;">${b.name}</h3>
