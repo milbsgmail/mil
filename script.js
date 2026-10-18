@@ -1,3 +1,37 @@
+// === БЛОК СОХРАНЕНИЯ И ЗАГРУЗКИ (В САМОМ ВЕРХУ) ===
+function saveGame() {
+    const dataToSave = {
+        gold: gold,
+        goldPerClick: goldPerClick,
+        upgradeCost: upgradeCost,
+        usedPromocodes: usedPromocodes,
+        brawlers: brawlers.map(b => { return { name: b.name, level: b.level }; }),
+        onlinePlayers: onlinePlayers,
+        lastMegaboxTime: lastMegaboxTime
+    };
+    localStorage.setItem('brawlClubSave', JSON.stringify(dataToSave));
+}
+
+function loadGame() {
+    const saved = localStorage.getItem('brawlClubSave');
+    if (!saved) { updateUI(); return; }
+    try {
+        const data = JSON.parse(saved);
+        if (data.gold !== undefined) gold = data.gold;
+        if (data.goldPerClick !== undefined) goldPerClick = data.goldPerClick;
+        if (data.upgradeCost !== undefined) upgradeCost = data.upgradeCost;
+        if (data.usedPromocodes !== undefined) usedPromocodes = data.usedPromocodes;
+        if (data.onlinePlayers !== undefined) onlinePlayers = data.onlinePlayers;
+        if (data.lastMegaboxTime !== undefined) lastMegaboxTime = data.lastMegaboxTime;
+        if (data.brawlers !== undefined) {
+            data.brawlers.forEach(savedB => {
+                const internalBrawler = brawlers.find(b => b.name === savedB.name);
+                if (internalBrawler) { internalBrawler.level = savedB.level; }
+            });
+        }
+    } catch (e) { console.error("Ошибка сохранения:", e); }
+    updateUI();
+}
 
 // 1. ЭЛЕМЕНТЫ СТРАНИЦЫ
 const counter = document.getElementById('gold-count');
@@ -63,14 +97,6 @@ const defaultBrawlers = [
 
 let brawlers = JSON.parse(JSON.stringify(defaultBrawlers));
 
-const allQuizQuestions = [
-    { question: "Кто начальный боец в Brawl Stars?", answers: ["Шелли", "Кольт", "Нита"], correct: 0 },
-    { question: "Какая редкость у Леона?", answers: ["Редкий", "Эпический", "Легендарный"], correct: 2 },
-    { question: "Какой боец бросает чемоданы?", answers: ["Мистер П.", "Гейл", "Лу"], correct: 0 },
-    { question: "Кто из них робот?", answers: ["Булл", "Рико", "Кольт"], correct: 1 },
-    { question: "Какое оружие у Кольта?", answers: ["Револьверы", "Дробовик", "Лук"], correct: 0 }
-];
-
 // КАСТОМНЫЕ УВЕДОМЛЕНИЯ
 function showBrawlAlert(message) {
     if (!alertContainer) return;
@@ -116,9 +142,7 @@ function updateUI() {
 
 // 6. КЛИКЕР, УЛЬТА И УЛУЧШЕНИЯ
 clickActionBtn.addEventListener('click', (event) => {
-    if (isUltReady && !isUltActive) {
-        activateUlt();
-    }
+    if (isUltReady && !isUltActive) { activateUlt(); }
     const currentClickPower = (goldPerClick + getBonusPower()) * ultMultiplier;
     gold += currentClickPower;
     if (counter) counter.textContent = Math.floor(gold);
@@ -226,25 +250,4 @@ resetProgressBtn.addEventListener('click', () => {
 // 7. СИСТЕМА ПРОМОКОДОВ
 promoBtn.addEventListener('click', () => {
     const code = promoInput.value.trim().toUpperCase();
-    if (code === "") {
-        promoMsg.style.color = "#ef4444";
-        promoMsg.textContent = "Введите code!";
-        return;
-    }
-    if (usedPromocodes.includes(code)) {
-        promoMsg.style.color = "#ef4444";
-        promoMsg.textContent = "Вы уже активировали этот промокод!";
-        return;
-    }
-    let success = false;
-    if (code === "BRAWL") { gold += 5000; success = true; }
-    else if (code === "GOLD") { gold += 50000; success = true; }
-    else if (code === "DEV100") { gold += 1000000; success = true; }
-    else if (code === "SHAKHTA") { goldPerClick += 20; success = true; }
-    else if (code === "FREECOINS") { gold += 1500; success = true; }
-    else if (code === "SHELLYUP") { if(brawlers[0]) { brawlers[0].level += 5; success = true; renderBrawlers(); } }
-    else if (code === "COLTUP") { if(brawlers[1]) { brawlers[1].level += 5; success = true; renderBrawlers(); } }
-    
-    if (success) {
-        showBrawlAlert(`Активирован промокод: ${code}!`);
-
+    if (code === "") { promoMsg.style.color = "#ef4444"; promoMsg.textContent = "Введите code!"; return; }
