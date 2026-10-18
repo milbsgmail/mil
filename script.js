@@ -241,8 +241,8 @@ promoBtn.addEventListener('click', () => {
     else if (code === "DEV100") { gold += 1000000; success = true; }
     else if (code === "SHAKHTA") { goldPerClick += 20; success = true; }
     else if (code === "FREECOINS") { gold += 1500; success = true; }
-    else if (code === "SHELLYUP") { if(brawlers[0]) brawlers[0].level += 5; success = true; renderBrawlers(); }
-    else if (code === "COLTUP") { if(brawlers[1]) brawlers[1].level += 5; success = true; renderBrawlers(); }
+    else if (code === "SHELLYUP") { if(brawlers[0]) { brawlers[0].level += 5; success = true; renderBrawlers(); } }
+    else if (code === "COLTUP") { if(brawlers[1]) { brawlers[1].level += 5; success = true; renderBrawlers(); } }
     
     if (success) {
         showBrawlAlert(`Активирован промокод: ${code}!`);
