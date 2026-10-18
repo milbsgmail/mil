@@ -203,20 +203,22 @@ if (upgradeBtn) {
 function renderBrawlers() {
     if (!brawlersList) return; 
     brawlersList.innerHTML = '';
+    
     brawlers.forEach((b, i) => {
         const cost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1)); 
         const card = document.createElement('div'); 
-        card.className = 'brawler-card';
+        card.className = `brawler-card brawler-${b.rarity || 'rare'}`;
         card.innerHTML = `
             <div class="avatar-fallback">${b.icon}</div>
-            <h3 style="margin:5px 0;color:#ffcc00;">${b.name}</h3>
-            <p style="margin:2px 0;font-size:14px;">Уровень: ${b.level}</p>
-            <p style="margin:2px 0;font-size:12px;color:#4ade80;">Клик: +${(b.level - 1) * b.bonus}</p>
-            <p style="margin:2px 0;font-size:12px;color:#60a5fa;">Пассив: +${(b.level - 1) * b.bonus_passive}/с</p>
+            <h3 style="margin:5px 0;color:#ffcc00; text-shadow: 1px 1px 0 #000;">${b.name}</h3>
+            <p style="margin:2px 0;font-size:14px;font-weight:bold;">Уровень: ${b.level}</p>
+            <p style="margin:2px 0;font-size:12px;color:#4ade80;font-weight:bold;">Клик: +${(b.level - 1) * b.bonus}</p>
+            <p style="margin:2px 0;font-size:12px;color:#60a5fa;font-weight:bold;">Пассив: +${(b.level - 1) * b.bonus_passive}/с</p>
             <button id="buy-brawler-${i}" style="padding:6px 12px;font-size:13px;width:100%;margin-top:10px;">Прокачать (${cost} З.)</button>
         `;
         brawlersList.appendChild(card);
         
+        // Навешиваем обработчик клика СРАЗУ внутри цикла, пока доступен индекс 'i' и объект 'b'
         document.getElementById(`buy-brawler-${i}`).addEventListener('click', () => {
             const currentCost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
             if (gold >= currentCost) { 
@@ -230,8 +232,5 @@ function renderBrawlers() {
                 showBrawlAlert("❌ Недостаточно золота!");
             }
         });
-    });
-}
-
-// --- 9. Викторина (Исправлено и завершено) ---
-function initQuiz() { 
+    }); // Здесь корректно закрывается brawlers.forEach
+} // Здесь корректно закрывается функция renderBrawlers
