@@ -73,6 +73,7 @@ const allQuizQuestions = [
 
 // КАСТОМНЫЕ УВЕДОМЛЕНИЯ
 function showBrawlAlert(message) {
+    if (!alertContainer) return;
     const alertBox = document.createElement('div');
     alertBox.className = 'brawl-alert';
     alertBox.innerText = message;
@@ -91,17 +92,16 @@ function switchTab(showSec) {
     if(showSec) showSec.style.display = 'block';
 }
 
-clickBtn.addEventListener('click', () => switchTab(clickSection));
-brawlerBtn.addEventListener('click', () => { switchTab(brawlersSection); renderBrawlers(); });
-quizBtn.addEventListener('click', () => { switchTab(quizSection); initQuiz(); });
-topBtn.addEventListener('click', () => { switchTab(topSection); renderLeaderboard(); });
+if (clickBtn) clickBtn.addEventListener('click', () => switchTab(clickSection));
+if (brawlerBtn) brawlerBtn.addEventListener('click', () => { switchTab(brawlersSection); renderBrawlers(); });
+if (quizBtn) quizBtn.addEventListener('click', () => { switchTab(quizSection); initQuiz(); });
+if (topBtn) topBtn.addEventListener('click', () => { switchTab(topSection); renderLeaderboard(); });
 
 // 4. МЕХАНИКА РАСЧЕТОВ КЛИКА И ПАССИВА
 function getBonusPower() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0);
 }
 
-// По правилам: пассивный доход начисляется, только если уровень бойца больше 1.
 function getPassiveIncome() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0), 0);
 }
@@ -115,18 +115,20 @@ function updateUI() {
 }
 
 // 6. КЛИКЕР, УЛЬТА И УЛУЧШЕНИЯ
-clickActionBtn.addEventListener('click', (event) => {
-    if (isUltReady && !isUltActive) {
-        activateUlt();
-    }
+if (clickActionBtn) {
+    clickActionBtn.addEventListener('click', (event) => {
+        if (isUltReady && !isUltActive) {
+            activateUlt();
+        }
 
-    const currentClickPower = (goldPerClick + getBonusPower()) * ultMultiplier;
-    gold += currentClickPower;
-    if (counter) counter.textContent = Math.floor(gold);
-    
-    createFloatingNumber(event, currentClickPower);
-    saveGame();
-});
+        const currentClickPower = (goldPerClick + getBonusPower()) * ultMultiplier;
+        gold += currentClickPower;
+        if (counter) counter.textContent = Math.floor(gold);
+        
+        createFloatingNumber(event, currentClickPower);
+        saveGame();
+    });
+}
 
 function createFloatingNumber(event, value) {
     const clickContainer = document.querySelector('.click-area-container');
@@ -150,15 +152,15 @@ function createFloatingNumber(event, value) {
     }, 700);
 }
 
-// Таймер появления Ульты (Супер-клика) — каждые 60 сек на 4 сек кнопка фиолетовая
+// Таймер появления Ульты (Супер-клика)
 setInterval(() => {
-    if (!isUltActive && !isUltReady) {
+    if (!isUltActive && !isUltReady && clickActionBtn) {
         isUltReady = true;
         clickActionBtn.classList.add('ult-ready');
         showBrawlAlert("⚡ СУПЕР-КЛИК ГОТОВ! Нажми на кнопку клика!");
         
         setTimeout(() => {
-            if (isUltReady && !isUltActive) {
+            if (isUltReady && !isUltActive && clickActionBtn) {
                 isUltReady = false;
                 clickActionBtn.classList.remove('ult-ready');
             }
@@ -167,6 +169,7 @@ setInterval(() => {
 }, 60000);
 
 function activateUlt() {
+    if (!clickActionBtn || !ultTimer) return;
     isUltReady = false;
     isUltActive = true;
     let oldMultiplier = ultMultiplier;
@@ -216,19 +219,21 @@ if (megaboxBtn) {
     });
 }
 
-upgradeBtn.addEventListener('click', () => {
-    if (gold >= upgradeCost) {
-        gold -= upgradeCost;
-        goldPerClick += 1;
-        upgradeCost = Math.round(upgradeCost * 1.5);
-        updateUI();
-        saveGame();
-    } else {
-        const originalText = upgradeBtn.textContent;
-        upgradeBtn.textContent = "Недостаточно золота!";
-        setTimeout(() => { upgradeBtn.textContent = originalText; }, 1000);
-    }
-});
+if (upgradeBtn) {
+    upgradeBtn.addEventListener('click', () => {
+        if (gold >= upgradeCost) {
+            gold -= upgradeCost;
+            goldPerClick += 1;
+            upgradeCost = Math.round(upgradeCost * 1.5);
+            updateUI();
+            saveGame();
+        } else {
+            const originalText = upgradeBtn.textContent;
+            upgradeBtn.textContent = "Недостаточно золота!";
+            setTimeout(() => { upgradeBtn.textContent = originalText; }, 1000);
+        }
+    });
+}
 
 if (resetProgressBtn) {
     resetProgressBtn.addEventListener('click', () => {
@@ -241,28 +246,22 @@ if (resetProgressBtn) {
 }
 
 // 7. СИСТЕМА ПРОМОКОДОВ
-promoBtn.addEventListener('click', () => {
-    const code = promoInput.value.trim().toUpperCase();
-    if (code === "") {
-        promoMsg.style.color = "#ef4444";
-        promoMsg.textContent = "Введите код!";
-        return;
-    }
-    if (usedPromocodes.includes(code)) {
-        promoMsg.style.color = "#ef4444";
-        promoMsg.textContent = "Вы уже активировали этот промокод!";
-        return;
-    }
+if (promoBtn) {
+    promoBtn.addEventListener('click', () => {
+        const code = promoInput.value.trim().toUpperCase();
+        if (code === "") {
+            promoMsg.style.color = "#ef4444";
+            promoMsg.textContent = "Введите code!";
+            return;
+        }
+        if (usedPromocodes.includes(code)) {
+            promoMsg.style.color = "#ef4444";
+            promoMsg.textContent = "Вы уже активировали этот промокод!";
+            return;
+        }
 
-    if (code === "BRAWL") {
-        gold += 5000;
-        showBrawlAlert("Получено +5,000 золота!");
-    } else if (code === "GOLD") {
-        gold += 50000;
-        showBrawlAlert("Получено +50,000 золота!");
-    } else if (code === "DEV100") {
-        gold += 1000000;
-        showBrawlAlert("Режим Создателя! +1,000,000 золота! 👑");
-    } else if (code === "SHELLYUP") {
-        if (brawlers[0]) brawlers[0].level += 5;
-        showBrawlAlert("Шелли прокачалась сразу на +5 уровней! 🔥");
+        if (code === "BRAWL") {
+            gold += 5000;
+            showBrawlAlert("Получено +5,000 золота!");
+        } else if (code === "GOLD") {
+            gold += 50000;
