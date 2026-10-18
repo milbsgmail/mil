@@ -61,7 +61,7 @@ const allQuizQuestions = [
     { question: "Какое оружие у Кольта?", answers: ["Револьверы", "Дробовик", "Лук"], correct: 0 }
 ];
 
-// 3. ПЕРЕКЛЮЧЕНИЕ МЕНЮ (НАВИГАЦИЯ)
+// 3. ПЕРЕКЛЮЧЕНИЕ МЕНЮ (НАВИГАНИЯ)
 function switchTab(showSec) {
     [quizSection, clickSection, brawlersSection, topSection].forEach(s => s.style.display = 'none');
     showSec.style.display = 'block';
@@ -81,6 +81,7 @@ function getPassiveIncome() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus_passive : 0), 0);
 }
 
+// 5. ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
 function updateUI() {
     counter.textContent = Math.floor(gold);
     clickPowerTxt.textContent = goldPerClick + getBonusPower();
@@ -88,13 +89,12 @@ function updateUI() {
     upgradeBtn.textContent = `Купить Шахту (Цена: ${upgradeCost} золота)`;
 }
 
-// 5. КЛИКЕР И УЛУЧШЕНИЯ
+// 6. КЛИКЕР И УЛУЧШЕНИЯ
 clickActionBtn.addEventListener('click', (event) => {
     const currentClickPower = goldPerClick + getBonusPower();
     gold += currentClickPower;
     counter.textContent = Math.floor(gold);
     
-    // Создание анимации вылетающего золота в месте клика
     createFloatingNumber(event, currentClickPower);
     saveGame();
 });
@@ -135,7 +135,6 @@ upgradeBtn.addEventListener('click', () => {
     }
 });
 
-// Кнопка сброса игрового прогресса
 if (resetProgressBtn) {
     resetProgressBtn.addEventListener('click', () => {
         const confirmReset = confirm("Вы уверены, что хотите обнулить весь игровой прогресс? Это действие нельзя отменить!");
@@ -146,7 +145,7 @@ if (resetProgressBtn) {
     });
 }
 
-// 6. СИСТЕМА ПРОМОКОДОВ
+// 7. СИСТЕМА ПРОМОКОДОВ
 promoBtn.addEventListener('click', () => {
     const code = promoInput.value.trim().toUpperCase();
     if (code === "") {
@@ -200,7 +199,7 @@ promoBtn.addEventListener('click', () => {
     saveGame();
 });
 
-// 7. ОТРЕНДЕРИТЬ СПИСОК БОЙЦОВ
+// 8. ОТРЕНДЕРИТЬ СПИСОК БОЙЦОВ
 function renderBrawlers() {
     brawlersList.innerHTML = "";
     brawlers.forEach((b, i) => {
@@ -208,7 +207,6 @@ function renderBrawlers() {
         const card = document.createElement('div');
         card.className = "brawler-card";
         
-        // Порядковый номер файла картинки (images/1.png для Шелли и т.д.)
         const imgNumber = i + 1;
         
         card.innerHTML = `
@@ -244,7 +242,7 @@ function renderBrawlers() {
     });
 }
 
-// 8. ДИНАМИЧЕСКАЯ ТАБЛИЦА ЛИДЕРОВ
+// 9. ДИНАМИЧЕСКАЯ ТАБЛИЦА ЛИДЕРОВ
 function renderLeaderboard() {
     const tableBody = document.querySelector('table tbody');
     if (!tableBody) return;
@@ -258,3 +256,8 @@ function renderLeaderboard() {
         const row = document.createElement('tr');
         if (player.name === "Вы (Игрок)") {
             row.style.color = "#ffcc00";
+            row.style.fontWeight = "bold";
+        }
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${player.name}</td>
