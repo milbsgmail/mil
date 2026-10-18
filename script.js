@@ -24,6 +24,10 @@ const promoBtn = document.getElementById('promo-btn');
 const promoMsg = document.getElementById('promo-msg');
 const resetProgressBtn = document.getElementById('reset-progress-btn');
 
+const megaboxBtn = document.getElementById('megabox-btn');
+const ultTimer = document.getElementById('ult-timer');
+const alertContainer = document.getElementById('custom-alert-container');
+
 // 2. ИГРОВЫЕ ДАННЫЕ
 let gold = 0;
 let goldPerClick = 1;
@@ -31,6 +35,12 @@ let upgradeCost = 15;
 let currentQuestionIndex = 0;
 let activeQuestions = [];
 let usedPromocodes = [];
+
+// Системные переменные для Ульты и Боксов
+let isUltReady = false;
+let isUltActive = false;
+let ultMultiplier = 1;
+let lastMegaboxTime = 0;
 
 let onlinePlayers = [
     { name: "Magician_BS", gold: 95400 },
@@ -61,16 +71,31 @@ const allQuizQuestions = [
     { question: "Какое оружие у Кольта?", answers: ["Револьверы", "Дробовик", "Лук"], correct: 0 }
 ];
 
+// КАСТOМНЫЕ УВЕДОМЛЕНИЯ
+function showBrawlAlert(message) {
+    const alertBox = document.createElement('div');
+    alertBox.className = 'brawl-alert';
+    alertBox.innerText = message;
+    alertContainer.appendChild(alertBox);
+    setTimeout(() => {
+        alertBox.style.opacity = '0';
+        alertBox.style.transform = 'translateY(-20px)';
+        alertBox.style.transition = 'all 0.4s ease';
+        setTimeout(() => alertBox.remove(), 400);
+    }, 3000);
+}
+
 // 3. ПЕРЕКЛЮЧЕНИЕ МЕНЮ (НАВИГАЦИЯ)
 function switchTab(showSec) {
-    [quizSection, clickSection, brawlersSection, topSection].forEach(s => s.style.display = 'none');
-    showSec.style.display = 'block';
+    [quizSection, clickSection, brawlersSection, topSection].forEach(s => { if(s) s.style.display = 'none'; });
+    if(showSec) showSec.style.display = 'block';
 }
 
 clickBtn.addEventListener('click', () => switchTab(clickSection));
 brawlerBtn.addEventListener('click', () => { switchTab(brawlersSection); renderBrawlers(); });
 quizBtn.addEventListener('click', () => { switchTab(quizSection); initQuiz(); });
 topBtn.addEventListener('click', () => { switchTab(topSection); renderLeaderboard(); });
+
 // 4. МЕХАНИКА РАСЧЕТОВ КЛИКА И ПАССИВА
 function getBonusPower() {
     return brawlers.reduce((sum, b) => sum + (b.level > 1 ? (b.level - 1) * b.bonus : 0), 0);
@@ -82,17 +107,22 @@ function getPassiveIncome() {
 
 // 5. ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
 function updateUI() {
-    counter.textContent = Math.floor(gold);
-    clickPowerTxt.textContent = goldPerClick + getBonusPower();
-    cpsDisplay.textContent = `В секунду: +${getPassiveIncome()} золота`;
-    upgradeBtn.textContent = `Купить Шахту (Цена: ${upgradeCost} золота)`;
+    if (counter) counter.textContent = Math.floor(gold);
+    if (clickPowerTxt) clickPowerTxt.textContent = (goldPerClick + getBonusPower()) * ultMultiplier;
+    if (cpsDisplay) cpsDisplay.textContent = `В секунду: +${getPassiveIncome()} золота`;
+    if (upgradeBtn) upgradeBtn.textContent = `Купить Шахту (Цена: ${upgradeCost} золота)`;
 }
 
-// 6. КЛИКЕР И УЛУЧШЕНИЯ
+// 6. КЛИКЕР, УЛЬТА И УЛУЧШЕНИЯ
 clickActionBtn.addEventListener('click', (event) => {
-    const currentClickPower = goldPerClick + getBonusPower();
+    // Проверка на активацию ульты
+    if (isUltReady && !isUltActive) {
+        activateUlt();
+    }
+
+    const currentClickPower = (goldPerClick + getBonusPower()) * ultMultiplier;
     gold += currentClickPower;
-    counter.textContent = Math.floor(gold);
+    if (counter) counter.textContent = Math.floor(gold);
     
     createFloatingNumber(event, currentClickPower);
     saveGame();
@@ -103,7 +133,7 @@ function createFloatingNumber(event, value) {
     if (!clickContainer) return;
 
     const floatEl = document.createElement('div');
-    floatEl.className = 'floating-number';
+    floatEl.className = isUltActive ? 'floating-number ult-float' : 'floating-number';
     floatEl.innerText = `+${value}`;
 
     const rect = clickContainer.getBoundingClientRect();
@@ -118,6 +148,73 @@ function createFloatingNumber(event, value) {
     setTimeout(() => {
         floatEl.remove();
     }, 700);
+}
+
+// Таймер появления Ульты (Супер-клика) — каждые 60 сек на 4 сек кнопка фиолетовая
+setInterval(() => {
+    if (!isUltActive && !isUltReady) {
+        isUltReady = true;
+        clickActionBtn.classList.add('ult-ready');
+        showBrawlAlert("⚡ СУПЕР-КЛИК ГОТОВ! Нажми на кнопку клика!");
+        
+        // Если за 4 секунды не нажал — ульта сгорает
+        setTimeout(() => {
+            if (isUltReady && !isUltActive) {
+                isUltReady = false;
+                clickActionBtn.classList.remove('ult-ready');
+            }
+        }, 4000);
+    }
+}, 60000);
+
+function activateUlt() {
+    isUltReady = false;
+    isUltActive = true;
+    ultMultiplier = 5; // Множитель клика х5
+    clickActionBtn.classList.remove('ult-ready');
+    clickActionBtn.classList.add('ult-active');
+    ultTimer.style.display = 'block';
+    ultTimer.style.width = '100%';
+    
+    showBrawlAlert("🔥 АКТИВИРОВАНА УЛЬТА! Клик Х5!");
+    updateUI();
+
+    let timeLeft = 100;
+    const animInterval = setInterval(() => {
+        timeLeft -= 2;
+        ultTimer.style.width = `${timeLeft}%`;
+        if (timeLeft <= 0) {
+            clearInterval(animInterval);
+            isUltActive = false;
+            ultMultiplier = 1;
+            clickActionBtn.classList.remove('ult-active');
+            ultTimer.style.display = 'none';
+            showBrawlAlert("Эффект ульты закончился.");
+            updateUI();
+            saveGame();
+        }
+    }, 100);
+}
+
+// Открытие Мегабокса
+if (megaboxBtn) {
+    megaboxBtn.addEventListener('click', () => {
+        const now = Date.now();
+        // Раз в минуту для тестов (вместо суток 86400000)
+        if (now - lastMegaboxTime < 60000) {
+            const remains = Math.ceil((60000 - (now - lastMegaboxTime)) / 1000);
+            showBrawlAlert(`Box заблокирован! Подожди еще ${remains} сек.`);
+            return;
+        }
+
+        const prize = Math.floor(Math.random() * 4501) + 500; // От 500 до 5000 монет
+        gold += prize;
+        lastMegaboxTime = now;
+        
+        showBrawlAlert(`📦 Из Мегабокса выпало: +${prize} золота! ⭐`);
+        updateUI();
+        saveGame();
+    });
 }
 
 upgradeBtn.addEventListener('click', () => {
@@ -143,6 +240,7 @@ if (resetProgressBtn) {
         }
     });
 }
+
 // 7. СИСТЕМА ПРОМОКОДОВ
 promoBtn.addEventListener('click', () => {
     const code = promoInput.value.trim().toUpperCase();
@@ -159,210 +257,13 @@ promoBtn.addEventListener('click', () => {
 
     if (code === "BRAWL") {
         gold += 5000;
-        promoMsg.style.color = "#4ade80";
-        promoMsg.textContent = "Успешно! Получено +5,000 золота!";
+        showBrawlAlert("Получено +5,000 золота!");
     } else if (code === "GOLD") {
         gold += 50000;
-        promoMsg.style.color = "#4ade80";
-        promoMsg.textContent = "Супер-код! Получено +50,000 золота!";
+        showBrawlAlert("Получено +50,000 золота!");
     } else if (code === "DEV100") {
         gold += 1000000;
-        promoMsg.style.color = "#a855f7";
-        promoMsg.textContent = "Режим Создателя! Получено +1,000,000 золота! 👑";
+        showBrawlAlert("Режим Создателя! +1,000,000 золота! 👑");
     } else if (code === "SHELLYUP") {
         if (brawlers[0]) brawlers[0].level += 5;
-        promoMsg.style.color = "#3b82f6";
-        promoMsg.textContent = "Шелли прокачалась сразу на +5 уровней! 🔥";
-    } else if (code === "COLTUP") {
-        if (brawlers[1]) brawlers[1].level += 5;
-        promoMsg.style.color = "#ec4899";
-        promoMsg.textContent = "Кольт прокачался сразу на +5 уровней! 🔫";
-    } else if (code === "SHAKHTA") {
-        goldPerClick += 20;
-        promoMsg.style.color = "#fb923c";
-        promoMsg.textContent = "Шахтерский бонус! Сила клика +20! ⛏️";
-    } else if (code === "FREECOINS") {
-        gold += 1500;
-        promoMsg.style.color = "#eab308";
-        promoMsg.textContent = "Монетки в кармане! Получено +1,500 золота! 🪙";
-    } else {
-        promoMsg.style.color = "#ef4444";
-        promoMsg.textContent = "Такого промокода не существует!";
-        return;
-    }
-
-    usedPromocodes.push(code);
-    promoInput.value = "";
-    updateUI();
-    saveGame();
-});
-
-// 8. ОТРЕНДЕРИТЬ СПИСОК БОЙЦОВ
-function renderBrawlers() {
-    brawlersList.innerHTML = "";
-    brawlers.forEach((b, i) => {
-        let cost = Math.round(b.baseCost * Math.pow(1.6, b.level - 1));
-        const card = document.createElement('div');
-        card.className = "brawler-card";
-        
-        const imgNumber = i + 1;
-        
-        card.innerHTML = `
-            <img src="images/${imgNumber}.png" alt="${b.name}" class="brawler-avatar">
-            <h3 class="brawler-name">${b.name}</h3>
-            <div class="brawler-level">Уровень: <b>${b.level}</b></div>
-            <div class="brawler-stats">
-                <div>💥 Сила клика: +${(b.level - 1) * b.bonus}</div>
-                <div>⏱️ Пассивный доход: +${(b.level - 1) * b.bonus_passive}/с</div>
-            </div>
-            <button id="up-brawler-${i}" class="brawler-up-btn">Прокачать: ${cost}</button>
-        `;
-        brawlersList.appendChild(card);
-
-        const upBtn = document.getElementById(`up-brawler-${i}`);
-        if (gold < cost) {
-            upBtn.style.opacity = "0.6";
-        }
-
-        upBtn.addEventListener('click', () => {
-            if (gold >= cost) {
-                gold -= cost;
-                b.level += 1;
-                saveGame();
-                updateUI();
-                renderBrawlers();
-            } else {
-                const oldTxt = upBtn.textContent;
-                upBtn.textContent = "Недостаточно золота!";
-                setTimeout(() => { upBtn.textContent = `Прокачать: ${cost}`; }, 1000);
-            }
-        });
-    });
-}
-// 9. ДИНАМИЧЕСКАЯ ТАБЛИЦА ЛИДЕРОВ
-function renderLeaderboard() {
-    const tableBody = document.querySelector('table tbody');
-    if (!tableBody) return;
-    
-    tableBody.innerHTML = "";
-    
-    let allPlayers = [...onlinePlayers, { name: "Вы (Игрок)", gold: gold }];
-    allPlayers.sort((a, b) => b.gold - a.gold);
-    
-    allPlayers.forEach((player, index) => {
-        const row = document.createElement('tr');
-        if (player.name === "Вы (Игрок)") {
-            row.style.color = "#ffcc00";
-            row.style.fontWeight = "bold";
-        }
-        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${player.name}</td>
-            <td>${Math.floor(player.gold)}</td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-
-// 10. ВИКТОРИНА — ИНИЦИАЛИЗАЦИЯ
-function initQuiz() {
-    currentQuestionIndex = 0;
-    activeQuestions = [...allQuizQuestions].sort(() => 0.5 - Math.random());
-    
-    const oldMsg = document.getElementById('quiz-status-msg');
-    if (oldMsg) oldMsg.remove();
-    
-    showQuestion();
-}
-
-// 11. ПОКАЗ ВОПРОСОВ (БЕЗ ОКНА ALERT)
-function showQuestion() {
-    answersBlock.innerHTML = "";
-    if (currentQuestionIndex >= activeQuestions.length) {
-        questionText.textContent = "Викторина пройдена! Возвращайтесь позже за новыми наградами.";
-        return;
-    }
-    
-    const q = activeQuestions[currentQuestionIndex];
-    questionText.textContent = q.question;
-    
-    let statusMsg = document.getElementById('quiz-status-msg');
-    if (!statusMsg) {
-        statusMsg = document.createElement('p');
-        statusMsg.id = 'quiz-status-msg';
-        statusMsg.style.fontSize = '18px';
-        statusMsg.style.fontWeight = 'bold';
-        statusMsg.style.marginTop = '15px';
-        statusMsg.style.minHeight = '24px';
-        answersBlock.parentNode.appendChild(statusMsg);
-    }
-    
-    q.answers.forEach((ans, idx) => {
-        const btn = document.createElement('button');
-        btn.textContent = ans;
-        btn.addEventListener('click', () => {
-            if (idx === q.correct) {
-                gold += 150;
-                updateUI();
-                statusMsg.style.color = "#4ade80";
-                statusMsg.textContent = "Правильно! Получено +150 золота. 🎉";
-            } else {
-                statusMsg.style.color = "#ef4444";
-                statusMsg.textContent = "Неправильно! Попробуй в следующий раз. ❌";
-            }
-            
-            // Ждем 1.5 секунды, очищаем текст и идем к следующему вопросу
-            setTimeout(() => {
-                statusMsg.textContent = "";
-                currentQuestionIndex++;
-                showQuestion();
-                saveGame();
-            }, 1500);
-        });
-        answersBlock.appendChild(btn);
-    });
-}
-
-// 12. ПАССИВНЫЙ ДОХОД ПО ТАЙМЕРУ
-setInterval(() => {
-    gold += getPassiveIncome();
-    counter.textContent = Math.floor(gold);
-}, 1000);
-
-// 13. СОХРАНЕНИЕ И ЗАГРУЗКА ИГРЫ
-function saveGame() {
-    const gameState = {
-        gold: gold,
-        goldPerClick: goldPerClick,
-        upgradeCost: upgradeCost,
-        usedPromocodes: usedPromocodes,
-        brawlers: brawlers
-    };
-    localStorage.setItem('brawlClubSave', JSON.stringify(gameState));
-}
-
-function loadGame() {
-    const savedData = localStorage.getItem('brawlClubSave');
-    if (savedData) {
-        try {
-            const gameState = JSON.parse(savedData);
-            gold = gameState.gold || 0;
-            goldPerClick = gameState.goldPerClick || 1;
-            upgradeCost = gameState.upgradeCost || 15;
-            usedPromocodes = gameState.usedPromocodes || [];
-            
-            if (gameState.brawlers) {
-                gameState.brawlers.forEach((savedBrawler, index) => {
-                    if (brawlers[index]) {
-                        brawlers[index].level = savedBrawler.level;
-                    }
-                });
-            }
-        } catch (e) {
-            console.error("Ошибка загрузки сохранения: ", e);
-        }
-    }
-    updateUI();
-}
-
-loadGame();
+        showBrawlAlert("Шелли прокачалась сразу на +5 уровней! 🔥");
